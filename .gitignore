@@ -1,0 +1,90 @@
+# Build directories
+build/
+bin/
+obj/
+out/
+debug/
+release/
+Debug/
+Release/
+
+# Compiled Object files
+*.o
+*.obj
+*.lo
+*.slo
+
+# Compiled Dynamic libraries
+*.so
+*.so.*
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.a
+*.lib
+*.lai
+*.la
+
+# Executables
+*.exe
+*.out
+*.app
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps/
+
+# Makefile
+Makefile
+
+# VS Code (опционально, если хотите игнорировать настройки IDE)
+.vscode/
+# Или только определенные файлы VS Code:
+# .vscode/settings.json
+# .vscode/tasks.json
+# .vscode/launch.json
+# .vscode/extensions.json
+
+# Visual Studio
+*.vcxproj.user
+*.vcxproj.filters
+*.sln.docstates
+*.suo
+*.user
+*.userosscache
+*.sln.docstates.json
+.vs/
+
+# Temporary files
+*.tmp
+*.temp
+*~
+*.swp
+*.swo
+
+# Log files
+*.log
+
+# Core dumps
+core
+core.*
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Package managers
+conan.lock
+vcpkg_installed/
