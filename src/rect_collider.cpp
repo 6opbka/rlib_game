@@ -64,7 +64,7 @@ void RectCollider::draw() const {
     Vector2 origin = {parent_sprite_size.x*scale.x,parent_sprite_size.y*scale.y}; // если нужно смещение центра
     Color transparent_green = {0,128,0,23};
 
-    // DrawRectanglePro(rect, origin, rotation, transparent_green);
+    DrawRectanglePro(rect, origin, rotation, transparent_green);
 }
 
 void RectCollider::on_parent_added(){

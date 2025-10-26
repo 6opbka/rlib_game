@@ -5,6 +5,7 @@
 GameRoot::GameRoot(){
     scale = {4.0f,4.0f};
     name = "game_root";
+    
 }
 GameRoot::~GameRoot(){}
 
@@ -26,24 +27,34 @@ void GameRoot::update(const float delta_time) {
         child->update(delta_time);
         grid_add_object(child);
     }
-
+    camera->update(delta_time);
     //Check collisions in grid now
     //better way to do this?
     check_collisions_in_grid();
     remove_marked_objects();
 
+    //сделать рендер для коллайддера отдельно. 
+    //и теперь прицеливается на точку на экране а не в мире
+    
+    
+    
+    
+
     cout<<"num of objects: "<<num_of_objects<<endl;
 }
 
-void GameRoot::render(const float delta_time){
+void GameRoot::render(const float delta_time){\
+    camera->cam_begin();
     for (auto& child : children) {
         if (child){
             
             child->render(delta_time);
             
+            
         } 
 
     }
+    camera->cam_end();
 }
 
 shared_ptr<GameObject> GameRoot::instantiate(shared_ptr<GameObject> object) {
@@ -106,4 +117,11 @@ void GameRoot::remove_marked_objects() {
             ++it;
         }
     }
+}
+
+void GameRoot::add_cam(shared_ptr<Cam> cam){
+    
+    camera = cam;
+    
+
 }

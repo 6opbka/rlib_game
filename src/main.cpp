@@ -66,12 +66,20 @@ int main() {
     weapon->sprite_manager = sprite_manager;
     weapon->add_sprite(weapon_sprite);
 
+    auto cam = make_shared<Cam>(player,Vector2{screen_width/2,screen_height/2});
+    cam->add_target(player);
+    
+    
     // Set up relationships
     weapon->initialize(game_root, bullet);
     game_root->add_child(player);
+    game_root->add_cam(cam);
     game_root->add_child(wall);
     game_root->root = game_root;
     player->add_child(weapon);
+
+    
+
 
 
     SetTargetFPS(144);
@@ -86,9 +94,10 @@ int main() {
         int fps = GetFPS();
         
         textColor.DrawText(to_string(fps), 190, 200, 20);
-        
-        game_root->render(delta_time);
+
         game_root->update(delta_time);
+        game_root->render(delta_time);
+        
         // game_root->instantiate(bullet);
         
         
