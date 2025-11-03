@@ -59,8 +59,6 @@ shared_ptr<GameObject> Player::clone() const{
 
 void Player::update(const float delta_time) {
 
-
-    
     GameObject::update(delta_time);
     input(delta_time);
     // cout<<"pois:"<<local_position.x<<" "<<local_position.y<<endl;

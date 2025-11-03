@@ -71,6 +71,7 @@ void GameObject::render(const float delta_time)
 void GameObject::draw_sprites(){
     if(sprite) sprite->draw();
     if(animated_sprite) animated_sprite->draw();
+    if(collider) collider->draw();
 }
 
 void GameObject::add_sprite(shared_ptr<Sprite> sprite_){
@@ -110,7 +111,7 @@ void GameObject::check_collision(shared_ptr<GameObject>target) {
         cout<<"target has no collider\n";
         return;
     }
-    collider->draw();
+    collider->calc_collider_shape();
     bool collision_detected = false;
     if(collider->can_collide_with(*target->collider)){
         ColliderShape this_shape = collider->get_col_shape();

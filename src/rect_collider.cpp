@@ -46,7 +46,7 @@ std::unique_ptr<Collider> RectCollider::clone() const{
     return new_collider; // Performs a shallow copy
 }
 
-void RectCollider::draw() const {
+void RectCollider::calc_collider_shape() {
     if (!parent) {
         cout << "no parent\n";
         return;
@@ -54,17 +54,24 @@ void RectCollider::draw() const {
     // cout<<Vector2{size.x*scale.x,size.y*scale.y}<<endl;
     
     Vector2 world_pos = parent->local_position; // если есть такой метод
-    float rotation = parent->rotation; // угол в градусах
-    Rectangle rect = {world_pos.x, world_pos.y, size.x * scale.x, size.y * scale.y};
+    rotation = parent->rotation; // угол в градусах
+    rect = {world_pos.x, world_pos.y, size.x * scale.x, size.y * scale.y};
 
     Vector2 parent_sprite_size = {0,0};
     if(parent->sprite) parent_sprite_size = parent->sprite->sprite_size;
     if(parent->animated_sprite) parent_sprite_size = parent->animated_sprite->sprite_size;
 
-    Vector2 origin = {parent_sprite_size.x*scale.x,parent_sprite_size.y*scale.y}; // если нужно смещение центра
-    Color transparent_green = {0,128,0,23};
+    origin = {parent_sprite_size.x*scale.x,parent_sprite_size.y*scale.y}; // если нужно смещение центра
+    
+    can_draw = true;
+    
+}
 
+void RectCollider::draw(){
+    if(!can_draw) return;
+    Color transparent_green = {0,128,0,23};
     DrawRectanglePro(rect, origin, rotation, transparent_green);
+    can_draw = false;
 }
 
 void RectCollider::on_parent_added(){

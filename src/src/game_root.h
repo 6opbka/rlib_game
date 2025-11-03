@@ -22,6 +22,8 @@ public:
 
     shared_ptr<Cam> camera;
 
+    Vector2 mouse_world_pos = {0.0f,0.0f};
+
 
     float pos = 0.0f;
 
@@ -35,6 +37,8 @@ public:
     void check_collisions_in_grid();
 
     void add_cam(shared_ptr<Cam> cam);
+    
+    void update_mouse_pos();
 
 
     shared_ptr<GameObject> instantiate(shared_ptr<GameObject> object);

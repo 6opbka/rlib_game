@@ -15,9 +15,6 @@ int main() {
     raylib::Color textColor(LIGHTGRAY);
     raylib::Window w(screen_width, screen_height, "Raylib C++ Starter Kit Example");
 
-
-
-
     auto game_root = make_shared<GameRoot>();
     auto sprite_manager = make_shared<SpriteManager>();
 
@@ -77,10 +74,6 @@ int main() {
     game_root->add_child(wall);
     game_root->root = game_root;
     player->add_child(weapon);
-
-    
-
-
 
     SetTargetFPS(144);
 

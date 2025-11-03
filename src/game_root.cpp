@@ -11,6 +11,7 @@ GameRoot::~GameRoot(){}
 
 void GameRoot::update(const float delta_time) {
     // Add pending children first
+    update_mouse_pos();
     grid.clear();
     if (!pending_children.empty()) {
         for (auto& child : pending_children) {
@@ -35,12 +36,10 @@ void GameRoot::update(const float delta_time) {
 
     //сделать рендер для коллайддера отдельно. 
     //и теперь прицеливается на точку на экране а не в мире
-    
-    
-    
-    
+    //сейчас коллизии считаются и рисуются здесь. 
+    //нужно разделить расчет и прорисовку на 2 разных метода. 
 
-    cout<<"num of objects: "<<num_of_objects<<endl;
+    // cout<<"num of objects: "<<num_of_objects<<endl;
 }
 
 void GameRoot::render(const float delta_time){\
@@ -50,9 +49,7 @@ void GameRoot::render(const float delta_time){\
             
             child->render(delta_time);
             
-            
         } 
-
     }
     camera->cam_end();
 }
@@ -81,7 +78,7 @@ void GameRoot::check_collisions_in_grid() {
     int collision_checks = 0;
     for (const auto& [cell, objects] : grid) {
         for (shared_ptr<GameObject> obj : objects) {
-            if (!(obj && obj->collider)) continue; // <-- исправлено
+            if (!(obj && obj->collider)) continue;
             for (int dx = -1; dx <= 1; ++dx) {
                 for (int dy = -1; dy <= 1; ++dy) {
                     Vector2 neighbour = {static_cast<float>(static_cast<int>(cell.x)+dx),
@@ -119,9 +116,12 @@ void GameRoot::remove_marked_objects() {
     }
 }
 
+void GameRoot::update_mouse_pos(){
+    mouse_world_pos = GetScreenToWorld2D(GetMousePosition(),camera->camera);
+    cout<<mouse_world_pos<<endl;
+}
+
 void GameRoot::add_cam(shared_ptr<Cam> cam){
-    
     camera = cam;
-    
 
 }

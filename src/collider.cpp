@@ -11,7 +11,7 @@ Collider::Collider(CollisionLayer col_layer,CollisionLayer col_mask):
 }
 
 
-void Collider::draw() const {
+void Collider::calc_collider_shape(){
     if (!parent) {
         cout << "no parent\n";
         return;

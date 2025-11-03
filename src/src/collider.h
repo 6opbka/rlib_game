@@ -52,8 +52,9 @@ public:
     bool can_collide_with (const Collider& other);
     
 
-    virtual void draw() const ;
+    virtual void calc_collider_shape();
     virtual void on_parent_added();
+    virtual void draw() = 0;
 
     virtual ColliderShape get_col_shape() const;
 
