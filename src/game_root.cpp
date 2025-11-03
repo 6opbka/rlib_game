@@ -22,22 +22,14 @@ void GameRoot::update(const float delta_time) {
         pending_children.clear();
     }
 
-    // Update existing children
     for (auto& child : children) {
         if (!child) return;
         child->update(delta_time);
         grid_add_object(child);
     }
     camera->update(delta_time);
-    //Check collisions in grid now
-    //better way to do this?
     check_collisions_in_grid();
     remove_marked_objects();
-
-    //сделать рендер для коллайддера отдельно. 
-    //и теперь прицеливается на точку на экране а не в мире
-    //сейчас коллизии считаются и рисуются здесь. 
-    //нужно разделить расчет и прорисовку на 2 разных метода. 
 
     // cout<<"num of objects: "<<num_of_objects<<endl;
 }
