@@ -1,6 +1,6 @@
-#include "src/map_gen.h"
+#include "src/map.h"
 #include <iostream>
-#include <vector>
+
 #include <cstdlib>
 
 using namespace std;
@@ -38,17 +38,15 @@ vector<Vector2> calculate_neighbours(int x, int y) {
 }
 
 void Map::gen_map() {
-    const int map_width = 64;
-    const int map_height = 64;
     const int num_elements = map_width * map_height;
     int retries = 2;
 
-    std::vector<int> map(num_elements);
+    map_vec.resize(num_elements);
     std::vector<int> new_map(num_elements);
 
     // Инициализация случайным образом
     for (int i = 0; i < num_elements; i++) {
-        map[i] = rand_pick();  // например, WALL или AIR
+        map_vec[i] = rand_pick();  // например, WALL или AIR
     }
 
     // Один шаг клеточного автомата
@@ -64,12 +62,12 @@ void Map::gen_map() {
                     int ny = (int)n.y;
                     if (nx < 0 || ny < 0 || nx >= map_width || ny >= map_height)
                         continue;
-                    if (map[ny * map_width + nx] == WALL)
+                    if (map_vec[ny * map_width + nx] == WALL)
                         wall_count++;
                 }
 
                 int index = y * map_width + x;
-                int cell = map[index];
+                int cell = map_vec[index];
 
                 // Классические правила:
                 if (cell == WALL) {
@@ -88,25 +86,44 @@ void Map::gen_map() {
             }
         }
     }
-    map.swap(new_map);
-
-
+        map_vec.swap(new_map);
     }
-    
-
-    //closing borders
 
 
-
-    // Применяем изменения
+    // create_texture();
 
     // Вывод карты
     for (int y = 0; y < map_height; y++) {
         for (int x = 0; x < map_width; x++) {
-            std::cout << (map[y * map_width + x] == WALL ? '#' : '.');
+            std::cout << (map_vec[y * map_width + x] == WALL ? '#' : '.');
         }
         std::cout << "\n";
     }
+}
+
+
+Texture2D Map::create_texture(){
+    const int tile_size = 16;
+    render_tex = LoadRenderTexture(map_width*tile_size,map_height*tile_size);
+    BeginTextureMode(render_tex);
+    ClearBackground(WHITE);
+    for(int y = 0; y<map_height;y++){
+        for(int x = 0;x<map_width;x++){
+            int cell = map_vec[y*map_height+x];
+            Vector2 pos = {(float)(x*tile_size),(float)(y*tile_size)};
+            if (cell == WALL) {
+            DrawRectangleV(pos, { (float)tile_size, (float)tile_size }, DARKGRAY);
+        } else {
+            DrawRectangleV(pos, { (float)tile_size, (float)tile_size }, LIGHTGRAY);
+        }
+        }
+    }
+    EndTextureMode();
+    return render_tex.texture;
+}
+
+void Map::calculate_colliders(){
+    
 }
 
 Map::Map(){

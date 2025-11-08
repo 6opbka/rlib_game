@@ -110,7 +110,7 @@ void GameRoot::remove_marked_objects() {
 
 void GameRoot::update_mouse_pos(){
     mouse_world_pos = GetScreenToWorld2D(GetMousePosition(),camera->camera);
-    cout<<mouse_world_pos<<endl;
+    // cout<<mouse_world_pos<<endl;
 }
 
 void GameRoot::add_cam(shared_ptr<Cam> cam){

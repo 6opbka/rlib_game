@@ -15,6 +15,11 @@ std::shared_ptr<Sprite> SpriteManager::make_sprite(const string& path, Vector2 p
     return ret;
 }
 
+std::shared_ptr<Sprite> SpriteManager::make_sprite(std::shared_ptr<Texture2D> texture, Vector2 pos, Vector2 sprite_size, Vector2 origin_offset){
+    auto ret = std::make_shared<Sprite>(texture, pos, sprite_size, origin_offset);
+    return ret;
+}
+
 
 std::shared_ptr<AnimatedSprite> SpriteManager::make_animated_sprite(
     const std::string& path,

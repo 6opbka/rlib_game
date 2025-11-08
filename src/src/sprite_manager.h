@@ -21,6 +21,8 @@ public:
     ~SpriteManager();
 
     std::shared_ptr<Sprite> make_sprite(const std::string& path, Vector2 pos, Vector2 sprite_size,Vector2 origin_offset = {0.0f,0.0f});
+    std::shared_ptr<Sprite> make_sprite(std::shared_ptr<Texture2D> texture, Vector2 pos, Vector2 sprite_size, Vector2 origin_offset = {0.0f,0.0f});
+    
     std::shared_ptr<AnimatedSprite> make_animated_sprite(const std::string& path, Vector2 pos, Vector2 sprite_size,Vector2 origin_offset = {0.0f,0.0f});
     void unload_all();
     void unload_sprite(const std::string& path);
