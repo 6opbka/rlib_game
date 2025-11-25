@@ -83,5 +83,5 @@ void RectCollider::on_parent_added(){
 
 
 float RectCollider::get_collider_radius(){
-
+    return 0.0f;
 }

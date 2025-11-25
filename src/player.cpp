@@ -54,7 +54,7 @@ void Player::input(const float delta_time) {
 }
 
 shared_ptr<GameObject> Player::clone() const{
-
+    return nullptr;
 }
 
 void Player::update(const float delta_time) {

@@ -3,13 +3,14 @@
 #include <fstream>
 #include <vector>
 
-class Map
+class MapGen
 {
 private:
     /* data */
+    bool inside(int x, int y);
 public:
-    Map();
-    ~Map();
+    MapGen();
+    ~MapGen();
 
     void gen_map();
     Texture2D create_texture();

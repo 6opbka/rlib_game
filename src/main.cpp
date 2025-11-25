@@ -11,17 +11,18 @@
 
 
 int main() {
-    int screen_width = 800;
-    int screen_height = 800;
+    int screen_width = 1024;
+    int screen_height = 1024;
     raylib::Color textColor(GREEN);
     raylib::Window w(screen_width, screen_height, "Raylib C++ Starter Kit Example");
 
     auto game_root = make_shared<GameRoot>();
     auto sprite_manager = make_shared<SpriteManager>();
     
-    Map map;
+    MapGen map;
     map.gen_map();
     Texture2D map_tex = map.create_texture();
+    map.calculate_colliders();
     auto map_ref = make_shared<Texture2D>(map_tex);
     //DEBUG
     // return 0;

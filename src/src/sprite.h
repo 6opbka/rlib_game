@@ -20,18 +20,18 @@ public:
     virtual ~Sprite();
     
     bool flip_x = false, flip_y = false;
-    Rectangle sprite_rect{};
-    Vector2 sprite_size{16, 16};
-    Vector2 origin_offset{0, 0};
+    Rectangle sprite_rect{0.0f,0.0f,0.0f,0.0f};
+    Vector2 sprite_size{16.0f, 16.0f};
+    Vector2 origin_offset{0.0f, 0.0f};
 
-    Vector2 pos_in_spritesheet {0,0};
+    Vector2 pos_in_spritesheet {0.0f,0.0f};
 
-    Vector2 global_position;
-    Vector2 local_position;
+    Vector2 global_position{0.0f,0.0f};
+    Vector2 local_position{0.0f,0.0f};
 
     Vector2 scale{4.0f, 4.0f};
 
-    float rotation = 0;
+    float rotation = 0.0f;
 
 
     bool is_animated = false; //I know its a bad design. Dont wanna try casting the object each frame.

@@ -61,7 +61,7 @@ void GameRoot::grid_add_object(shared_ptr<GameObject> object) {
     if (!object) return;
 int _x = static_cast<int>(object->local_position.x / grid_cell_size);
 int _y = static_cast<int>(object->local_position.y / grid_cell_size);
-Vector2 cell_coord = { _x, _y };
+Vector2 cell_coord = { (float)_x, (float)_y };
 grid[cell_coord].push_back(object);
 }
 
