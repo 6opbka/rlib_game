@@ -42,7 +42,6 @@ CTestTestfile.cmake
 _deps/
 
 # Makefile
-Makefile
 
 # VS Code (опционально, если хотите игнорировать настройки IDE)
 .vscode/
