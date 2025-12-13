@@ -1,7 +1,7 @@
 #pragma once
 #include "gameobject.h"
 #include "bullet.h"
-#include "utility.hpp"
+#include "utility.h"
 
 class Weapon : public GameObject
 {

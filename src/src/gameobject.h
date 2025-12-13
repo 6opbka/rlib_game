@@ -3,7 +3,7 @@
 #include <memory>
 #include <vector>
 #include <string>
-#include "utility.hpp"
+#include "utility.h"
 #include "sprite_manager.h"
 #include "sprite.h"
 #include "animated_sprite.h"

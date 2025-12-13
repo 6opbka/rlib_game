@@ -1,8 +1,9 @@
-#pragma once
-#include "raylib.h"
-#include "raymath.h"
-#include "math.h"
-#include <iostream>
+#include "src/utility.h"
+
+
+
+
+
 
 Vector2 operator+(const Vector2 &l, const Vector2 &r) {
     return {l.x + r.x, l.y + r.y};
@@ -60,10 +61,6 @@ std::ostream& operator<<(std::ostream& os, const Vector2& vec) {
     return os;
 }
 
-inline bool operator==(const Vector2& a, const Vector2& b) {
+bool operator==(const Vector2& a, const Vector2& b) {
     return Vector2Equals(a,b);
 }
-
-
-
-
