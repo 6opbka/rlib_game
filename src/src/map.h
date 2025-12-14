@@ -3,7 +3,7 @@
 #include <fstream>
 #include <vector>
 
-class MapGen
+class MapGen 
 {
 private:
     /* data */
@@ -19,9 +19,15 @@ public:
     std::vector<int> map_vec;
     const int map_width = 64;
     const int map_height = 64;
+    const int tile_size = 16;
 
     RenderTexture2D render_tex = {0};
 
+};
+
+struct Edge{
+    Vector2 pos_1 = {0,0};
+    Vector2 pos_2 = {0,0};
 };
 
 

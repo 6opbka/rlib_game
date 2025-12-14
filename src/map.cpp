@@ -104,7 +104,7 @@ void MapGen::gen_map() {
 
 
 Texture2D MapGen::create_texture(){
-    const int tile_size = 16;
+    
     render_tex = LoadRenderTexture(map_width*tile_size,map_height*tile_size);
     BeginTextureMode(render_tex);
     ClearBackground(WHITE);
@@ -126,8 +126,8 @@ Texture2D MapGen::create_texture(){
 void MapGen::calculate_colliders(){
     vector<bool> visited(map_height*map_width);
 
+    // Calculating islands 
     vector<vector<Vector2>> islands;
-
     for(int y = 0; y<map_height; y++){
         for(int x = 0; x<map_width; x++){
             int index = y*map_width+x;
@@ -154,24 +154,62 @@ void MapGen::calculate_colliders(){
                                 visited[neighbour_idx] = true;
                                 q.push({(float)n_x,(float)n_y});
                             }
-
-
                     }
-
                 }
                 islands.push_back(island);
-
             }
         }
     }
+    // Calculating island colliders
+    int i = 0;
+    vector<vector<Edge>> all_edges(islands.size());
+    for(auto island : islands){
+        vector<Edge> island_edges;
+        for(Vector2 pos : island){
+            // cout<<"("<<pos.x<<", "<<pos.y<<"), ";
+            int x = pos.x;
+            int y = pos.y;
+
+            Vector2 tl = {x*tile_size, y*tile_size};
+            Vector2 tr = {(x+1)*tile_size, y*tile_size};
+            Vector2 bl = {x*tile_size, (y+1)*tile_size};
+            Vector2 br = {(x+1)*tile_size, (y+1)*tile_size};
+            // UP
+            if (!inside(x, y-1) || map_vec[(y-1)*map_width + x] != WALL) {
+                island_edges.push_back({ tl, tr });
+            }
+
+            // DOWN
+            if (!inside(x, y+1) || map_vec[(y+1)*map_width + x] != WALL) {
+                island_edges.push_back({ bl, br });
+            }
+
+            // LEFT
+            if (!inside(x-1, y) || map_vec[y*map_width + (x-1)] != WALL) {
+                island_edges.push_back({ tl, bl });
+            }
+
+            // RIGHT
+            if (!inside(x+1, y) || map_vec[y*map_width + (x+1)] != WALL) {
+                island_edges.push_back({ tr, br });
+            }
+        }
+        all_edges[i] = island_edges;
+        i++;
+
+    }
 
     cout<<"num islands: "<<islands.size()<<endl;
+    cout<<"num all_edges: "<<all_edges.size()<<endl;
+
 }
 
 bool MapGen::inside(int x, int y){
     return (x>=0&&x<map_width&&
             y>=0&&y<map_height);
 }
+
+
 
 MapGen::MapGen(){
 
