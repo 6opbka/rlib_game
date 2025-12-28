@@ -1,33 +1,11 @@
 #pragma once
 #include "raylib.h"
 #include <memory>
+#include "utility.hpp"
 
 
 class GameObject;
 
-enum CollisionLayer :uint32_t {
-    LAYER_NONE = 0,
-    LAYER_PLAYER = 1 << 0,
-    LAYER_ENEMY = 1 << 1,
-    LAYER_BULLET = 1 << 2,
-    LAYER_ENEMY_BULLET = 1 << 3,
-    LAYER_WALL = 1 << 4,
-    LAYER_ALL = 0xFFFFFFFF
-};
-
-inline CollisionLayer operator|(CollisionLayer a, CollisionLayer b) {
-    return static_cast<CollisionLayer>(static_cast<uint32_t>(a) | static_cast<uint32_t>(b));
-}
-
-inline CollisionLayer operator&(CollisionLayer a, CollisionLayer b) {
-    return static_cast<CollisionLayer>(static_cast<uint32_t>(a) & static_cast<uint32_t>(b));
-}
-
-enum ColliderShape:uint8_t{
-    NONE = 0,
-    RECTANGLE = 1 << 0,
-    CIRCLE = 1 << 1
-};
 
 
 class Collider {

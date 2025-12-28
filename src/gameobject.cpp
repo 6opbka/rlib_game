@@ -51,10 +51,14 @@ void GameObject::remove_child(GameObject *child){
 
 }
 
-void GameObject::added_parent_callback(){
-    if(!parent) return;
-    scale = {parent->scale.x * scale.x, parent->scale.y * scale.x};
-    
+void GameObject::added_parent_callback() {
+    auto p = parent.lock();
+    if (!p) return;
+
+    scale = {
+        p->scale.x * scale.x,
+        p->scale.y * scale.y
+    };
 }
 
 void GameObject::render(const float delta_time)
@@ -101,42 +105,42 @@ void GameObject::add_collider(unique_ptr<Collider> collider_){
         collider->on_parent_added();
 }
 
-void GameObject::check_collision(shared_ptr<GameObject>target) {
+void GameObject::check_collision_dynamic(GameObject& target) {
     if(!collider){
         cout<<"no collider\n";
         return;
     }
 
-    if(!target->collider){
+    if(!target.collider){
         cout<<"target has no collider\n";
         return;
     }
     collider->calc_collider_shape();
     bool collision_detected = false;
-    if(collider->can_collide_with(*target->collider)){
+    if(collider->can_collide_with(*target.collider)){
         ColliderShape this_shape = collider->get_col_shape();
-        ColliderShape target_shape = target->collider->get_col_shape();
+        ColliderShape target_shape = target.collider->get_col_shape();
 
         if(this_shape == RECTANGLE){
             if(target_shape == RECTANGLE){
-                if(CheckCollisionRecs(collider->get_collider_rec(),target->collider->get_collider_rec())){
+                if(CheckCollisionRecs(collider->get_collider_rec(),target.collider->get_collider_rec())){
                     collision_detected = true;
                 }
             }
             else if(target_shape == CIRCLE){
-                if(CheckCollisionCircleRec(target->local_position, target->collider->get_collider_radius(), collider->get_collider_rec())){
+                if(CheckCollisionCircleRec(target.local_position, target.collider->get_collider_radius(), collider->get_collider_rec())){
                     collision_detected = true;
                 }
             }
         }
         else if(this_shape == CIRCLE){
             if(target_shape == RECTANGLE){
-                if(CheckCollisionCircleRec(local_position, collider->get_collider_radius(), target->collider->get_collider_rec())){
+                if(CheckCollisionCircleRec(local_position, collider->get_collider_radius(), target.collider->get_collider_rec())){
                     collision_detected = true;
                 }
             }
             else if(target_shape == CIRCLE){
-                if(CheckCollisionCircles(local_position, collider->get_collider_radius(), target->local_position, target->collider->get_collider_radius())){
+                if(CheckCollisionCircles(local_position, collider->get_collider_radius(), target.local_position, target.collider->get_collider_radius())){
                     collision_detected = true;
                 }
             }
@@ -144,16 +148,25 @@ void GameObject::check_collision(shared_ptr<GameObject>target) {
     }
     if(collision_detected){
         this->on_collision();
-        target -> on_collision();
+        target.on_collision();
 
     }
 }
 
+void GameObject::check_collision_static(const Line& edge){
+    if(!collider){
+        cout<<"no collider\n";
+        return;
+    }
+}
 
 
 Vector2 GameObject::get_world_position() const {
-    if (parent) return parent->get_world_position() + local_position;
-    return position;
+    auto p = parent.lock();
+    if (p){
+        return p->get_world_position() + local_position;
+    } 
+    return local_position;
 }
 
 void GameObject::update(const float delta_time){
@@ -169,4 +182,10 @@ std::shared_ptr<GameObject> GameObject::clone() const {
 
 void GameObject::on_collision(){
     // cout<<"colliding"<<endl;
+}
+
+shared_ptr<GameRoot> GameObject::get_root(){
+    auto r = root.lock();
+    if(!r) return NULL;
+    return r;
 }

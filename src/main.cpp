@@ -56,7 +56,7 @@ int main() {
     wall->sprite_manager = sprite_manager;
     wall->add_sprite(wall_sprite);
     wall->add_collider(move(wall_collider));
-    wall->local_position = {400.0f,200.0f};
+    wall->local_position = {256.0f,256.0f};
     wall->name = "wall";
   
 

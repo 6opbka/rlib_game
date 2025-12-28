@@ -3,7 +3,7 @@
 #include <memory>
 #include <vector>
 #include <string>
-#include "utility.h"
+#include "utility.hpp"
 #include "sprite_manager.h"
 #include "sprite.h"
 #include "animated_sprite.h"
@@ -25,14 +25,13 @@ using namespace std;
         shared_ptr<Sprite> sprite;
         shared_ptr<AnimatedSprite> animated_sprite;
    
-        Vector2 position{0, 0};
         Vector2 scale{1.0f, 1.0f};
 
         Vector2 local_position{0.0f,0.0f};
 
-        shared_ptr<GameRoot> root;
+        weak_ptr<GameRoot> root;
         std::shared_ptr<SpriteManager> sprite_manager;
-        shared_ptr<GameObject> parent;
+        weak_ptr<GameObject> parent;
         vector<shared_ptr<GameObject>> children;
 
         unique_ptr<Collider> collider;
@@ -59,12 +58,17 @@ using namespace std;
 
         virtual shared_ptr<GameObject> clone() const;
 
-        void check_collision(std::shared_ptr<GameObject> target);
+        void check_collision_dynamic(GameObject& target);
+        void check_collision_static(const Line& edge);
+
 
 
         GameObject();
         GameObject(const GameObject& other);
         virtual ~GameObject();
         virtual void on_collision();
+
+    protected:
+        shared_ptr<GameRoot> get_root();
         
     };

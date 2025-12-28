@@ -29,7 +29,8 @@ void Weapon::update(const float delta_time){
 }
 
 void Weapon::follow_mouse(){
-    Vector2 mouse_pos = root->mouse_world_pos;
+    auto r = get_root();
+    Vector2 mouse_pos = r->mouse_world_pos;
     direction = vector2_normalize(mouse_pos - get_world_position());
     float angle_rad = std::atan2(direction.y, direction.x);
     float angle_deg = angle_rad * 180.0f / PI;
@@ -53,12 +54,13 @@ void Weapon::initialize(shared_ptr<GameRoot> _root, shared_ptr<Bullet> bullet) {
 }
 
 void Weapon::shoot() {
-    auto new_bullet = bullet_template->clone();
-    if (!new_bullet) return;
-    
-    new_bullet->local_position = get_world_position() + direction * barrel_offset;
-    new_bullet->rotation = rotation;
-    root->instantiate(new_bullet);  // Single instantiation call
+    auto bullet = bullet_template->clone();
+    if (!bullet) return;
+
+    bullet->local_position = get_world_position() + direction * barrel_offset;
+    bullet->rotation = rotation;
+    auto r = get_root();
+    r->instantiate(bullet);
 }
 
 shared_ptr<GameObject> Weapon::clone() const {

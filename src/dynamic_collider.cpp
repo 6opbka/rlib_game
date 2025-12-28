@@ -1,4 +1,4 @@
-#include "src/collider.h"
+#include "src/dynamic_collider.h"
 #include <iostream>
 #include "src/gameobject.h"
 using namespace std;
@@ -6,9 +6,7 @@ using namespace std;
 Collider::Collider(CollisionLayer col_layer,CollisionLayer col_mask):
     layer(col_layer),
     mask(col_mask)
-{
-    
-}
+{}
 
 
 void Collider::calc_collider_shape(){

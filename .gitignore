@@ -43,13 +43,9 @@ _deps/
 
 # Makefile
 
-# VS Code (опционально, если хотите игнорировать настройки IDE)
+# VS Code 
 .vscode/
-# Или только определенные файлы VS Code:
-# .vscode/settings.json
-# .vscode/tasks.json
-# .vscode/launch.json
-# .vscode/extensions.json
+
 
 # Visual Studio
 *.vcxproj.user

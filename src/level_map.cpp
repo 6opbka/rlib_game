@@ -344,7 +344,6 @@ void LevelMap::grid_add_colliders(){
     }
     for(const Line& edge: all_edges_ver){
         grid_add_vert_wall(edge);
-
     }
     
 

@@ -1,5 +1,5 @@
 #include "src/player.h"
-#include "src/utility.h"
+#include "src/utility.hpp"
 #include <iostream>
 
 Player::Player(){

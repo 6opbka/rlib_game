@@ -26,7 +26,7 @@ std::shared_ptr<GameObject> Bullet::clone() const {
 void Bullet::update(float delta_time){
     move(delta_time);
     GameObject::update(delta_time);
-    // check_collision();
+    // check_collision_dynamic();
 }
 
 void Bullet::move (float delta_time){
@@ -57,7 +57,7 @@ Bullet::Bullet(const Bullet& other) {
 void Bullet::on_collision() {
     marked_for_deletion = true;
 
-    // cout<<"ya blya sha zahuyaru sebya\n"
+    // cout<<"ya blya sha zahuyaru sebya\n";
 }
 
 

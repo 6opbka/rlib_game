@@ -1,6 +1,7 @@
 #include "src/game_root.h"
 #include "src/bullet.h"
 #include <set>
+#include <algorithm>
 
 GameRoot::GameRoot(){
     scale = {4.0f,4.0f};
@@ -47,11 +48,13 @@ void GameRoot::render(const float delta_time){\
 }
 
 shared_ptr<GameObject> GameRoot::instantiate(shared_ptr<GameObject> object) {
-    auto new_object = object->clone();
-    new_object->parent = shared_from_this();  // Set parent relationship
-    pending_children.push_back(new_object);
-    return new_object;
+    if (!object) return nullptr;
+
+    object->parent = shared_from_this();
+    pending_children.push_back(object);
+    return object;
 }
+
 shared_ptr<GameObject> GameRoot::clone() const{
     // return std::make_shared<GameRoot>(*this);
     return nullptr;
@@ -68,32 +71,41 @@ grid[cell_coord].push_back(object);
 void GameRoot::check_collisions_in_grid() {
     std::set<std::pair<GameObject*, GameObject*>> checked;
     int collision_checks = 0;
+
     for (const auto& [cell, objects] : grid) {
-        for (shared_ptr<GameObject> obj : objects) {
-            if (!(obj && obj->collider)) continue;
+        for (const auto& obj_sp : objects) {
+
+            GameObject* obj = obj_sp.get();
+            if (!obj || !obj->collider) continue;
+
             for (int dx = -1; dx <= 1; ++dx) {
                 for (int dy = -1; dy <= 1; ++dy) {
-                    Vector2 neighbour = {static_cast<float>(static_cast<int>(cell.x)+dx),
-                                         static_cast<float>(static_cast<int>(cell.y)+dy)};
-                    if (grid.count(neighbour)) {
-                        for (shared_ptr<GameObject> other : grid[neighbour]) {
-                            if (obj != other && other && other->collider) {
-                                auto pair = std::make_pair(std::min(obj.get(), other.get()), std::max(obj.get(), other.get()));
-                                if (checked.count(pair) == 0) {
-                                    obj->check_collision(other);
-                                    checked.insert(pair);
-                                    collision_checks++;
-                                }
-                            }
+
+                    Vector2 neighbour = {
+                        cell.x + dx,
+                        cell.y + dy
+                    };
+
+                    auto it = grid.find(neighbour);
+                    if (it == grid.end()) continue;
+
+                    for (const auto& other_sp : it->second) {
+
+                        GameObject* other = other_sp.get();
+                        if (!other || !other->collider || obj == other) continue;
+
+                        auto pair = std::minmax(obj, other);
+                        if (checked.insert(pair).second) {
+                            obj->check_collision_dynamic(*other);
+                            collision_checks++;
                         }
                     }
                 }
             }
         }
     }
-    // cout<< "number of objects: "<<num_of_objects;
-    // cout << " Collision checks: " << collision_checks << std::endl;
 }
+
 
 
 void GameRoot::remove_marked_objects() {
