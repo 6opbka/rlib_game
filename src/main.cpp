@@ -6,7 +6,7 @@
 #include "src/game_root.h"
 #include "src/sprite_manager.h"
 #include "src/rect_collider.h"
-#include "src/map.h"
+#include "src/level_map.h"
 
 
 
@@ -18,12 +18,9 @@ int main() {
 
     auto game_root = make_shared<GameRoot>();
     auto sprite_manager = make_shared<SpriteManager>();
+    game_root->sprite_manager = sprite_manager;
+    game_root->init_map();
     
-    MapGen map;
-    map.gen_map();
-    Texture2D map_tex = map.create_texture();
-    map.calculate_colliders();
-    auto map_ref = make_shared<Texture2D>(map_tex);
     //DEBUG
     // return 0;
 
@@ -36,7 +33,6 @@ int main() {
     auto player_sprite2 = sprite_manager->make_animated_sprite("resources/knight_spritesheet.png",{0,0},{16.0f,16.0f});
     auto wall_sprite = sprite_manager->make_sprite("resources/wall.png",{0,0},{16.0f,16.0f});
     
-    auto map_sprite = sprite_manager->make_sprite(map_ref,{0,0},{16.0f*64,16.0f*64});
     // auto player_collider = make_unique<Collider>(Vector2{32.0f,32.0f});
     // auto bullet_collider = make_unique<Collider>(Vector2{24.0f,16.0f});
     // auto wall_collider = make_unique<Collider>(Vector2{32.0f,32.0f});
@@ -78,15 +74,10 @@ int main() {
     auto cam = make_shared<Cam>(player,Vector2{(float)screen_width/2,(float)screen_height/2});
     cam->add_target(player);
 
-    auto map_ = make_shared<GameObject>();
-    map_->name = "map";
-    map_->sprite_manager = sprite_manager;
-    map_->add_sprite(map_sprite);
     
     
     // Set up relationships
     weapon->initialize(game_root, bullet);
-    game_root->add_child(map_);
     game_root->add_child(player);
     game_root->add_cam(cam);
     game_root->add_child(wall);

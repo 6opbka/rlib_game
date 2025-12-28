@@ -1,7 +1,9 @@
-#include "src/map.h"
+#include "src/level_map.h"
 #include <iostream>
 #include <stack>
 #include <cstdlib>
+#include <map>
+#include <algorithm>
 
 using namespace std;
 
@@ -37,7 +39,7 @@ vector<Vector2> calculate_neighbours(int x, int y) {
     return out;
 }
 
-void MapGen::gen_map() {
+void LevelMap::gen_map() {
     const int num_elements = map_width * map_height;
     int retries = 2;
 
@@ -102,8 +104,14 @@ void MapGen::gen_map() {
     
 }
 
+void LevelMap::normalize_edge(Line& edge){
+    if(edge.a.x>edge.b.x||edge.a.y>edge.b.y){
+        swap(edge.a,edge.b);    
+    }
+}
 
-Texture2D MapGen::create_texture(){
+
+Texture2D LevelMap::create_texture(){
     
     render_tex = LoadRenderTexture(map_width*tile_size,map_height*tile_size);
     BeginTextureMode(render_tex);
@@ -123,11 +131,11 @@ Texture2D MapGen::create_texture(){
     return render_tex.texture;
 }
 
-void MapGen::calculate_colliders(){
+void LevelMap::calculate_colliders(){
     vector<bool> visited(map_height*map_width);
 
-    // Calculating islands 
-    vector<vector<Vector2>> islands;
+    // Calculating raw_islands 
+    vector<vector<Vector2>> raw_islands;
     for(int y = 0; y<map_height; y++){
         for(int x = 0; x<map_width; x++){
             int index = y*map_width+x;
@@ -156,16 +164,18 @@ void MapGen::calculate_colliders(){
                             }
                     }
                 }
-                islands.push_back(island);
+                raw_islands.push_back(island);
             }
         }
     }
     // Calculating island colliders
     int i = 0;
-    vector<vector<Edge>> all_edges(islands.size());
-    for(auto island : islands){
-        vector<Edge> island_edges;
-        for(Vector2 pos : island){
+    
+    // vector<vector<Line>> islands(raw_islands.size());
+    islands.resize(raw_islands.size());
+    for(auto island : raw_islands){
+        vector<Line> island_edges;
+        for(Vector2& pos : island){
             // cout<<"("<<pos.x<<", "<<pos.y<<"), ";
             int x = pos.x;
             int y = pos.y;
@@ -194,26 +204,195 @@ void MapGen::calculate_colliders(){
                 island_edges.push_back({ tr, br });
             }
         }
-        all_edges[i] = island_edges;
+        islands[i] = island_edges;
         i++;
 
     }
 
+    // Normalizing egdes
+    for (auto& island : islands){
+        for(Line& edge : island){
+            normalize_edge(edge);
+        }
+    }
+
+    // Merging lines 
+    // merged_islands.resize(islands.size());
+
+    for (const auto& island : islands){
+        map<int,vector<Line>> hor_edges;
+        map<int,vector<Line>> ver_edges;
+
+        for(const Line& edge : island){
+            if(edge.a.y==edge.b.y){
+                hor_edges[edge.a.y].push_back(edge);
+            }
+            else if(edge.a.x==edge.b.x){
+                ver_edges[edge.a.x].push_back(edge);
+            }
+        }
+
+        
+
+        for(auto& [y, edges] : hor_edges){
+            merge_collinear(edges,all_edges_hor,true);
+        }
+        for(auto& [x,edges] : ver_edges){
+            merge_collinear(edges,all_edges_ver,false);
+        }
+
+
+    }
+
+    cout<<"num raw_islands: "<<raw_islands.size()<<endl;
     cout<<"num islands: "<<islands.size()<<endl;
-    cout<<"num all_edges: "<<all_edges.size()<<endl;
+    cout<<"num all_edges_hor: "<<all_edges_hor.size()<<endl;
+    cout<<"num all_edges_ver: "<<all_edges_ver.size()<<endl;
+
+
 
 }
 
-bool MapGen::inside(int x, int y){
+Texture2D LevelMap::redraw_colliders_as_tex(){
+    
+    render_tex = LoadRenderTexture(map_width*tile_size,map_height*tile_size);
+    BeginTextureMode(render_tex);
+    ClearBackground(WHITE);
+    for(int y = 0; y<map_height;y++){
+        for(int x = 0;x<map_width;x++){
+            int cell = map_vec[y*map_width+x];
+            Vector2 pos = {(float)(x*tile_size),(float)(y*tile_size)};
+            if (cell == WALL) {
+            DrawRectangleV(pos, { (float)tile_size, (float)tile_size }, DARKGRAY);
+        } else {
+            DrawRectangleV(pos, { (float)tile_size, (float)tile_size }, LIGHTGRAY);
+        }
+        }
+    }
+    int i = 1;
+    for (const auto& edge : all_edges_ver) {
+    
+
+    unsigned char r = (unsigned char)((i * 50) % 256);
+    unsigned char g = (unsigned char)((i * 80) % 256);
+    unsigned char b = (unsigned char)((i * 110) % 256);
+
+    Color c = { r, g, b, 255 };
+
+    DrawLineV(edge.a, edge.b, c);
+    i++;
+    
+    }
+    for (const auto& edge : all_edges_hor) {
+    
+
+    unsigned char r = (unsigned char)((i * 50) % 256);
+    unsigned char g = (unsigned char)((i * 80) % 256);
+    unsigned char b = (unsigned char)((i * 110) % 256);
+
+    Color c = { r, g, b, 255 };
+
+    DrawLineV(edge.a, edge.b, c);
+    i++;
+    
+    }
+    EndTextureMode();
+    return render_tex.texture;
+}
+
+bool LevelMap::inside(int x, int y){
     return (x>=0&&x<map_width&&
             y>=0&&y<map_height);
 }
 
+void LevelMap::merge_collinear(vector<Line>& edges, vector<Line>& merged, bool horizontal){
+    if (edges.empty()) return;
 
+    // 1. Сортировка
+    std::sort(edges.begin(), edges.end(),
+        [horizontal](const Line& e1, const Line& e2) {
+            return horizontal
+                ? e1.a.x < e2.a.x
+                : e1.a.y < e2.a.y;
+        });
 
-MapGen::MapGen(){
+    Line current = edges[0];
+
+    // 2. Линейный проход
+    for (int i = 1; i < edges.size(); i++) {
+        float curr_end = horizontal ? current.b.x : current.b.y;
+        float next_start = horizontal ? edges[i].a.x : edges[i].a.y;
+
+        if (next_start <= curr_end) {
+            // расширяем текущий
+            if (horizontal)
+                current.b.x = std::max(current.b.x, edges[i].b.x);
+            else
+                current.b.y = std::max(current.b.y, edges[i].b.y);
+        } else {
+            merged.push_back(current);
+            current = edges[i];
+        }
+    }
+
+    merged.push_back(current);
+}
+
+void LevelMap::grid_add_colliders(){
+    for(const Line& edge: all_edges_hor){
+        grid_add_hor_wall(edge);
+    }
+    for(const Line& edge: all_edges_ver){
+        grid_add_vert_wall(edge);
+
+    }
+    
+
+    cout<<"Cell num: "<<static_grid.size()<<endl;
 
 }
-MapGen::~MapGen(){
+
+void LevelMap::grid_add_vert_wall(const Line& edge){
+    int x = edge.a.x;
+    int y0 = edge.a.y;
+    int y1 = edge.b.y;
+
+    if(y1<y0) std::swap(y0,y1);
+
+    int cell_x = floor(x/ spatial_collider_grid_size);
+    int y_start = floor(y0/ spatial_collider_grid_size);
+    int y_end   = floor(y1 / spatial_collider_grid_size);
+
+    for (int y = y_start; y <= y_end; ++y) {
+        static_grid[{(float)cell_x, (float)y}].push_back(edge);
+    }
+
+}
+
+
+
+void LevelMap::grid_add_hor_wall(const Line& edge){
+    
+    int y = edge.a.y;
+    int x0 = edge.a.x;
+    int x1 = edge.b.x;
+    
+    if(x1<x0) std::swap(x0,x1);
+
+    int cell_y = floor(y/ spatial_collider_grid_size);
+    int x_start = floor(x0/ spatial_collider_grid_size);
+    int x_end   = floor(x1 / spatial_collider_grid_size);
+
+    for (int y = x_start; y <= x_end; ++y) {
+        static_grid[{(float)cell_y, (float)y}].push_back(edge);
+    }
+
+}
+
+
+LevelMap::LevelMap(){
+
+}
+LevelMap::~LevelMap(){
 
 }

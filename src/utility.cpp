@@ -64,3 +64,4 @@ std::ostream& operator<<(std::ostream& os, const Vector2& vec) {
 bool operator==(const Vector2& a, const Vector2& b) {
     return Vector2Equals(a,b);
 }
+

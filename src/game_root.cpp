@@ -59,8 +59,8 @@ shared_ptr<GameObject> GameRoot::clone() const{
 
 void GameRoot::grid_add_object(shared_ptr<GameObject> object) {
     if (!object) return;
-int _x = static_cast<int>(object->local_position.x / grid_cell_size);
-int _y = static_cast<int>(object->local_position.y / grid_cell_size);
+int _x = static_cast<int>(object->local_position.x / spatial_collider_grid_size);
+int _y = static_cast<int>(object->local_position.y / spatial_collider_grid_size);
 Vector2 cell_coord = { (float)_x, (float)_y };
 grid[cell_coord].push_back(object);
 }
@@ -116,4 +116,19 @@ void GameRoot::update_mouse_pos(){
 void GameRoot::add_cam(shared_ptr<Cam> cam){
     camera = cam;
 
+}
+
+void GameRoot::init_map(){
+    map.gen_map();
+    Texture2D map_tex = map.create_texture();
+    map.calculate_colliders();
+    map_tex = map.redraw_colliders_as_tex();
+    auto map_ref = make_shared<Texture2D>(map_tex);
+    auto map_sprite = sprite_manager->make_sprite(map_ref,{0,0},{16.0f*64,16.0f*64});
+    map.grid_add_colliders();
+    auto map_ = make_shared<GameObject>();
+    map_->name = "map";
+    map_->sprite_manager = sprite_manager;
+    map_->add_sprite(map_sprite);
+    add_child(map_);
 }

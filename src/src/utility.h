@@ -4,6 +4,9 @@
 #include "math.h"
 #include <iostream>
 
+const int spatial_collider_grid_size = 128;
+
+
 Vector2 operator+(const Vector2 &l, const Vector2 &r);
 Vector2 operator-(const Vector2 &l, const Vector2 &r);
 Vector2 operator*(const Vector2 &l, float r);

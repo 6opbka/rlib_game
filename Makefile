@@ -10,7 +10,7 @@ binDir := $(buildDir)/bin
 executable := app
 target := $(binDir)/$(executable)
 
-sources := $(call rwildcard,src/,*.cpp)
+sources := $(call rwildcard,src/,*.cpp,*.hpp)
 objects := $(patsubst src/%, $(objDir)/%, $(patsubst %.cpp, %.o, $(sources)))
 depends := $(patsubst %.o, %.d, $(objects))
 
@@ -51,7 +51,7 @@ endif
 .PHONY: all setup submodules execute clean
 
 # Default target
-all: $(target) execute clean
+all: $(target) execute 
 
 # Setup
 setup: include lib
