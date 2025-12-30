@@ -363,7 +363,7 @@ void LevelMap::grid_add_vert_wall(const Line& edge){
     int y_end   = floor(y1 / spatial_collider_grid_size);
 
     for (int y = y_start; y <= y_end; ++y) {
-        static_grid[{(float)cell_x, (float)y}].push_back(edge);
+        static_grid[{cell_x, y}].push_back(edge);
     }
 
 }
@@ -383,7 +383,7 @@ void LevelMap::grid_add_hor_wall(const Line& edge){
     int x_end   = floor(x1 / spatial_collider_grid_size);
 
     for (int y = x_start; y <= x_end; ++y) {
-        static_grid[{(float)cell_y, (float)y}].push_back(edge);
+        static_grid[{cell_y, y}].push_back(edge);
     }
 
 }

@@ -12,7 +12,7 @@ Weapon::Weapon(const Weapon& other) :
 {
     if (other.collider) {
         collider = other.collider->clone(); 
-        collider->parent = shared_from_this(); // clone returns unique_ptr<Collider>
+        collider->parent = shared_from_this(); // clone returns unique_ptr<DynamicCollider>
     } else {
         collider.reset();
     }

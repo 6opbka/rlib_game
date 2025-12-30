@@ -6,7 +6,8 @@
 GameRoot::GameRoot(){
     scale = {4.0f,4.0f};
     name = "game_root";
-    
+    dynamic_grid.resize(map.map_height*map.map_width);
+    cout<<"dynamic_grid size: "<<dynamic_grid.size()<<"\n";
 }
 GameRoot::~GameRoot(){}
 
@@ -62,10 +63,10 @@ shared_ptr<GameObject> GameRoot::clone() const{
 
 void GameRoot::grid_add_object(shared_ptr<GameObject> object) {
     if (!object) return;
-int _x = static_cast<int>(object->local_position.x / spatial_collider_grid_size);
-int _y = static_cast<int>(object->local_position.y / spatial_collider_grid_size);
-Vector2 cell_coord = { (float)_x, (float)_y };
-grid[cell_coord].push_back(object);
+    int _x = static_cast<int>(object->local_position.x / spatial_collider_grid_size);
+    int _y = static_cast<int>(object->local_position.y / spatial_collider_grid_size);
+    Cell cell_coord = { _x, _y };
+    grid[cell_coord].push_back(object);
 }
 
 void GameRoot::check_collisions_in_grid() {
@@ -81,7 +82,7 @@ void GameRoot::check_collisions_in_grid() {
             for (int dx = -1; dx <= 1; ++dx) {
                 for (int dy = -1; dy <= 1; ++dy) {
 
-                    Vector2 neighbour = {
+                    Cell neighbour = {
                         cell.x + dx,
                         cell.y + dy
                     };

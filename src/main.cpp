@@ -33,9 +33,9 @@ int main() {
     auto player_sprite2 = sprite_manager->make_animated_sprite("resources/knight_spritesheet.png",{0,0},{16.0f,16.0f});
     auto wall_sprite = sprite_manager->make_sprite("resources/wall.png",{0,0},{16.0f,16.0f});
     
-    // auto player_collider = make_unique<Collider>(Vector2{32.0f,32.0f});
-    // auto bullet_collider = make_unique<Collider>(Vector2{24.0f,16.0f});
-    // auto wall_collider = make_unique<Collider>(Vector2{32.0f,32.0f});
+    // auto player_collider = make_unique<DynamicCollider>(Vector2{32.0f,32.0f});
+    // auto bullet_collider = make_unique<DynamicCollider>(Vector2{24.0f,16.0f});
+    // auto wall_collider = make_unique<DynamicCollider>(Vector2{32.0f,32.0f});
 
     auto player_collider = make_unique<RectCollider>(Vector2{32.0f,32.0f},LAYER_PLAYER,LAYER_ENEMY_BULLET);
     auto bullet_collider = make_unique<RectCollider>(Vector2{24.0f,16.0f},LAYER_BULLET,LAYER_WALL | LAYER_ENEMY);

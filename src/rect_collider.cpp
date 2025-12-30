@@ -1,10 +1,11 @@
 #include "src/rect_collider.h"
+#include "src/static_line_collider.h"
 #include "src/gameobject.h"
 
 
 RectCollider::RectCollider(Vector2 size_, CollisionLayer col_layer,CollisionLayer col_mask):
     size(size_),
-    Collider(col_layer,col_mask)
+    DynamicCollider(col_layer,col_mask)
 {
     collider_shape = RECTANGLE;
 }
@@ -39,7 +40,7 @@ ColliderShape RectCollider::get_col_shape()const{
     return collider_shape;
 }
 
-std::unique_ptr<Collider> RectCollider::clone() const{
+std::unique_ptr<DynamicCollider> RectCollider::clone() const{
     auto new_collider = std::make_unique<RectCollider>(*this);
     new_collider->layer = this->layer;
     new_collider->mask = this->mask;
@@ -80,36 +81,27 @@ void RectCollider::on_parent_added(){
     cout<<scale<<"\n";
 }
 
-bool RectCollider::collide (const Collider& other) {
+bool RectCollider::dynamic_collide (const DynamicCollider& other) {
     calc_collider_shape();
-    if(can_collide_with(other)){
-        ColliderShape other_shape = other.get_col_shape();
-        switch (other_shape)
-        {
-        case RECTANGLE:
-            if(CheckCollisionRecs(get_collider_rec(),other.get_collider_rec())){
-                return true;
-            }
-            break;
-        case CIRCLE:
-            if(CheckCollisionCircleRec(other.parent->local_position, other.get_collider_radius(),get_collider_rec())){
-                return true;
-            }
-            break;
-        case LINE:
-            break;
-        
-        default:
-            break;
-        }
-        
+
+    if(!can_collide_with(other)) return false;
+
+    if(auto* rect = dynamic_cast<const RectCollider*>(&other)){
+        return CheckCollisionRecs(get_collider_rec(), rect->get_collider_rec());
     }
+    
     return false;
 }
 
+bool RectCollider::static_collide (const StaticCollider& other) {
+    calc_collider_shape();
 
+    if(!can_collide_with(other)) return false;
 
-
-float RectCollider::get_collider_radius()const{
-    return 0.0f;
+    if(auto* line = dynamic_cast<const StaticLineCollider*>(&other)){
+        Line coords = line->get_col_line();
+        return CheckCollisionLineRec(coords.a,coords.b,get_collider_rec());
+    }
+    
+    return false;
 }

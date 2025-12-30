@@ -28,7 +28,7 @@ public:
     
     void calculate_colliders();
 
-    std::unordered_map<Vector2,std::vector<Line>,CellCoordHash> static_grid;
+    std::unordered_map<Cell,std::vector<Line>,CellCoordHash> static_grid;
     void grid_add_colliders();
     
     std::vector<int> map_vec;

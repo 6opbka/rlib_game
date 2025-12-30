@@ -16,6 +16,6 @@ public:
     Vector2 offset = {0.0f,0.0f};
     
     StaticCollider(CollisionLayer layer, CollisionLayer mask, ColliderShape shape);
-    ~StaticCollider();
+    virtual ~StaticCollider() = default;
 };
 

@@ -29,7 +29,8 @@ public:
     void render(const float delta_time);
     std::vector<std::shared_ptr<GameObject>> pending_children;
     //Partitioning grid for collision detection
-    std::unordered_map<Vector2, std::vector<shared_ptr<GameObject>>, CellCoordHash> grid;
+    std::vector<GameObject*> dynamic_grid; 
+    std::unordered_map<Cell, std::vector<shared_ptr<GameObject>>, CellCoordHash> grid;
     
     void grid_add_object(shared_ptr<GameObject> object);
     void check_collisions_in_grid();

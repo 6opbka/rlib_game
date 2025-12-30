@@ -96,7 +96,7 @@ void GameObject::add_animated_sprite(shared_ptr<AnimatedSprite> sprite_){
     
 }
 
-void GameObject::add_collider(unique_ptr<Collider> collider_){
+void GameObject::add_collider(unique_ptr<DynamicCollider> collider_){
         cout<<"adding collider: "<<name<<"\n";
         //VSYE PO PIZDE POSHLO )) ) )) ) )) 000 )))
         collider = move(collider_);
@@ -111,51 +111,20 @@ void GameObject::check_collision_dynamic(GameObject& target) {
         return;
     }
 
-    collider->calc_collider_shape();
-    if(collider->collide(*target.collider)){
+    if(collider->dynamic_collide(*target.collider)){
         this->on_collision();
         target.on_collision();
     }
-    
-    // if(collider->can_collide_with(*target.collider)){
-    //     ColliderShape this_shape = collider->get_col_shape();
-    //     ColliderShape target_shape = target.collider->get_col_shape();
-
-    //     if(this_shape == RECTANGLE){
-    //         if(target_shape == RECTANGLE){
-    //             if(CheckCollisionRecs(collider->get_collider_rec(),target.collider->get_collider_rec())){
-    //                 collision_detected = true;
-    //             }
-    //         }
-    //         else if(target_shape == CIRCLE){
-    //             if(CheckCollisionCircleRec(target.local_position, target.collider->get_collider_radius(), collider->get_collider_rec())){
-    //                 collision_detected = true;
-    //             }
-    //         }
-    //     }
-    //     else if(this_shape == CIRCLE){
-    //         if(target_shape == RECTANGLE){
-    //             if(CheckCollisionCircleRec(local_position, collider->get_collider_radius(), target.collider->get_collider_rec())){
-    //                 collision_detected = true;
-    //             }
-    //         }
-    //         else if(target_shape == CIRCLE){
-    //             if(CheckCollisionCircles(local_position, collider->get_collider_radius(), target.local_position, target.collider->get_collider_radius())){
-    //                 collision_detected = true;
-    //             }
-    //         }
-    //     }
-    // }
-    // if(collision_detected){
-
-
-    // }
 }
 
-void GameObject::check_collision_static(const Line& edge){
-    if(!collider){
+void GameObject::check_collision_static(const StaticCollider* target){
+    if(!collider|| !target){
         cout<<"no collider\n";
         return;
+    }
+
+    if(collider->static_collide(*target)){
+        this->on_collision();
     }
 }
 

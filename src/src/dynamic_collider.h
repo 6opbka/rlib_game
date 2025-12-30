@@ -2,17 +2,18 @@
 #include "raylib.h"
 #include <memory>
 #include "utility.hpp"
+#include "static_collider.h"
 
 
 class GameObject;
 
 
 
-class Collider {
+class DynamicCollider {
 public:
-    Collider() = default;
-    Collider(CollisionLayer col_layer,CollisionLayer col_mask);
-    virtual ~Collider() = default;
+    DynamicCollider() = default;
+    DynamicCollider(CollisionLayer col_layer,CollisionLayer col_mask);
+    virtual ~DynamicCollider() = default;
 
 
     CollisionLayer layer = LAYER_NONE;
@@ -27,20 +28,18 @@ public:
 
     std::shared_ptr<GameObject> parent;
 
-    bool can_collide_with (const Collider& other);
+    bool can_collide_with (const DynamicCollider& other);
+    bool can_collide_with (const StaticCollider& other);
 
-    virtual bool collide(const Collider& other) = 0;
-    
+
+    virtual bool dynamic_collide(const DynamicCollider& other) = 0;
+    virtual bool static_collide (const StaticCollider& other) = 0;
 
     virtual void calc_collider_shape();
     virtual void on_parent_added();
     virtual void draw() = 0;
 
-    virtual ColliderShape get_col_shape() const;
+    virtual ColliderShape get_col_shape() const;    
 
-    virtual Rectangle get_collider_rec() const = 0;  
-
-    virtual float get_collider_radius() const = 0;         
-
-    virtual std::unique_ptr<Collider> clone() const = 0;
+    virtual std::unique_ptr<DynamicCollider> clone() const = 0;
 };

@@ -1,10 +1,11 @@
 #pragma once
 
 #include "dynamic_collider.h"
+#include "static_collider.h"
 
 
 
-class RectCollider : public Collider
+class RectCollider : public DynamicCollider
 {
 public:
     /* data */
@@ -16,16 +17,16 @@ public:
     RectCollider(Vector2 size_, CollisionLayer col_layer,CollisionLayer col_mask);
     ~RectCollider();
 
-    bool collide (const Collider& other) override;
+    bool dynamic_collide (const DynamicCollider& other) override;
+    bool static_collide (const StaticCollider& other) override;
+
 
     ColliderShape get_col_shape() const override;
     void calc_collider_shape() override;
     void draw() override;
     
-    Rectangle get_collider_rec() const override;
-    float get_collider_radius() const override;
-
-    std::unique_ptr<Collider> clone() const override;
+    Rectangle get_collider_rec() const ;
+    std::unique_ptr<DynamicCollider> clone() const override;
     void on_parent_added() override;
 
 private:

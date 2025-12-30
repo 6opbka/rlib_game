@@ -8,7 +8,7 @@ StaticCollider::StaticCollider(CollisionLayer layer, CollisionLayer mask, Collid
 {
 }
 
-StaticCollider::~StaticCollider()
-{
-}
+// StaticCollider::~StaticCollider()
+// {
+// }
 
