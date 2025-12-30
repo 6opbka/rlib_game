@@ -28,6 +28,8 @@ public:
     std::shared_ptr<GameObject> parent;
 
     bool can_collide_with (const Collider& other);
+
+    virtual bool collide(const Collider& other) = 0;
     
 
     virtual void calc_collider_shape();
@@ -36,9 +38,9 @@ public:
 
     virtual ColliderShape get_col_shape() const;
 
-    virtual Rectangle get_collider_rec() = 0;  
+    virtual Rectangle get_collider_rec() const = 0;  
 
-    virtual float get_collider_radius() = 0;         
+    virtual float get_collider_radius() const = 0;         
 
     virtual std::unique_ptr<Collider> clone() const = 0;
 };

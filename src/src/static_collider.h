@@ -6,14 +6,16 @@ class StaticCollider
 private:
     /* data */
 public:
-    StaticCollider(/* args */);
+    CollisionLayer col_layer = LAYER_NONE;
+    CollisionLayer col_mask = LAYER_ALL;
+
+    ColliderShape col_shape = NONE;
+
+    Vector2 position = {0.0f,0.0f};
+    Vector2 scale = {2.0f,2.0f};
+    Vector2 offset = {0.0f,0.0f};
+    
+    StaticCollider(CollisionLayer layer, CollisionLayer mask, ColliderShape shape);
     ~StaticCollider();
 };
 
-StaticCollider::StaticCollider(/* args */)
-{
-}
-
-StaticCollider::~StaticCollider()
-{
-}

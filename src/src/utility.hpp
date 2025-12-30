@@ -3,6 +3,7 @@
 #include "raymath.h"
 #include "math.h"
 #include <iostream>
+#include <cstdint>
 
 const int spatial_collider_grid_size = 64;
 
@@ -17,7 +18,7 @@ struct CellCoordHash {
     }
 };
 
-enum CollisionLayer :uint32_t {
+enum CollisionLayer:uint32_t {
     LAYER_NONE = 0,
     LAYER_PLAYER = 1 << 0,
     LAYER_ENEMY = 1 << 1,
@@ -37,28 +38,29 @@ inline CollisionLayer operator&(CollisionLayer a, CollisionLayer b) {
 
 enum ColliderShape:uint8_t{
     NONE = 0,
-    RECTANGLE = 1 << 0,
-    CIRCLE = 1 << 1
+	LINE = 1		<< 0,
+    RECTANGLE = 1	<< 1,
+    CIRCLE = 1		<< 2
 };
 
 
 
-Vector2 operator+(const Vector2 &l, const Vector2 &r) {
+inline Vector2 operator+(const Vector2 &l, const Vector2 &r) {
     return {l.x + r.x, l.y + r.y};
 }
 
-Vector2 operator-(const Vector2 &l, const Vector2 &r) {
+inline Vector2 operator-(const Vector2 &l, const Vector2 &r) {
     return {l.x - r.x, l.y - r.y};
 }
 
 
 // Scalar multiplication
-Vector2 operator*(const Vector2 &l, float r) {
+inline Vector2 operator*(const Vector2 &l, float r) {
     return {l.x * r, l.y * r};
 }
 
 // Scalar division
-Vector2 operator/(const Vector2& l, float r) {
+inline Vector2 operator/(const Vector2& l, float r) {
     if (r == 0.0f) return {0.0f, 0.0f};
     return {l.x / r, l.y / r};
 }
@@ -66,40 +68,40 @@ Vector2 operator/(const Vector2& l, float r) {
 
 
 // Vector length
-float vector2_length(const Vector2 vec) {
+inline float vector2_length(const Vector2 vec) {
     return sqrtf(vec.x * vec.x + vec.y * vec.y);
 }
 
 // Normalization
-Vector2 vector2_normalize(const Vector2 vec) {
+inline Vector2 vector2_normalize(const Vector2 vec) {
     float len = vector2_length(vec);
     return (len != 0.0f) ? vec / len : Vector2{0.0f, 0.0f};
 }
 
 // Compound addition
-Vector2& operator+=(Vector2& left, const Vector2& right) {
+inline Vector2& operator+=(Vector2& left, const Vector2& right) {
     left.x += right.x;
     left.y += right.y;
     return left;
 }
 
 // Compound subtraction
-Vector2& operator-=(Vector2& left, const Vector2& right) {
+inline Vector2& operator-=(Vector2& left, const Vector2& right) {
     left.x -= right.x;
     left.y -= right.y;
     return left;
 }
 
-float operator/ (const Vector2& left, const Vector2&right){
+inline float operator/ (const Vector2& left, const Vector2&right){
     return vector2_length(left)/vector2_length(right);
 }
 
-std::ostream& operator<<(std::ostream& os, const Vector2& vec) {
+inline std::ostream& operator<<(std::ostream& os, const Vector2& vec) {
     os << "(" << vec.x << ", " << vec.y << ")";
     return os;
 }
 
-bool operator==(const Vector2& a, const Vector2& b) {
+inline bool operator==(const Vector2& a, const Vector2& b) {
     return Vector2Equals(a,b);
 }
 

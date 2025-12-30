@@ -13,7 +13,7 @@ RectCollider::~RectCollider(){}
 
 
 
-Rectangle RectCollider::get_collider_rec(){
+Rectangle RectCollider::get_collider_rec()const {
     Vector2 origin = {0, 0};
     if (parent->sprite) {
         Vector2 sprite_size = parent->sprite->sprite_size;
@@ -80,8 +80,36 @@ void RectCollider::on_parent_added(){
     cout<<scale<<"\n";
 }
 
+bool RectCollider::collide (const Collider& other) {
+    calc_collider_shape();
+    if(can_collide_with(other)){
+        ColliderShape other_shape = other.get_col_shape();
+        switch (other_shape)
+        {
+        case RECTANGLE:
+            if(CheckCollisionRecs(get_collider_rec(),other.get_collider_rec())){
+                return true;
+            }
+            break;
+        case CIRCLE:
+            if(CheckCollisionCircleRec(other.parent->local_position, other.get_collider_radius(),get_collider_rec())){
+                return true;
+            }
+            break;
+        case LINE:
+            break;
+        
+        default:
+            break;
+        }
+        
+    }
+    return false;
+}
 
 
-float RectCollider::get_collider_radius(){
+
+
+float RectCollider::get_collider_radius()const{
     return 0.0f;
 }

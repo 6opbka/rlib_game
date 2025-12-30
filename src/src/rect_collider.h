@@ -16,12 +16,14 @@ public:
     RectCollider(Vector2 size_, CollisionLayer col_layer,CollisionLayer col_mask);
     ~RectCollider();
 
+    bool collide (const Collider& other) override;
+
     ColliderShape get_col_shape() const override;
     void calc_collider_shape() override;
     void draw() override;
     
-    Rectangle get_collider_rec() override;
-    float get_collider_radius() override;
+    Rectangle get_collider_rec() const override;
+    float get_collider_radius() const override;
 
     std::unique_ptr<Collider> clone() const override;
     void on_parent_added() override;
