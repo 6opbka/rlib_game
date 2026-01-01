@@ -3,7 +3,7 @@
 
 Bullet::Bullet(){
     name = "bullet";
-    scale = {.5f,.5f};
+    
 }
 Bullet::~Bullet(){}
 

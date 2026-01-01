@@ -3,7 +3,6 @@
 
 GameObject::GameObject()
 {
-    scale = {1.0f, 1.0f};
     rotation = 0.0f;
 }
 
@@ -112,6 +111,7 @@ void GameObject::check_collision_dynamic(GameObject& target) {
     }
 
     if(collider->dynamic_collide(*target.collider)){
+        // cout<<"Pepe\n";
         this->on_collision();
         target.on_collision();
     }

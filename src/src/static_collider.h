@@ -12,7 +12,7 @@ public:
     ColliderShape col_shape = NONE;
 
     Vector2 position = {0.0f,0.0f};
-    Vector2 scale = {2.0f,2.0f};
+    Vector2 scale = {1.0f,1.0f};
     Vector2 offset = {0.0f,0.0f};
     
     StaticCollider(CollisionLayer layer, CollisionLayer mask, ColliderShape shape);

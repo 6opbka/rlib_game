@@ -14,7 +14,7 @@ public:
     ~Weapon();
 
     Vector2 direction = {0,0};
-    float barrel_offset = 90.0f;
+    float barrel_offset = 45.0f;
 
     shared_ptr<Bullet> bullet_template;
     

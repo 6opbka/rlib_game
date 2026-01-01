@@ -4,7 +4,7 @@
 
 
 Weapon::Weapon(){
-    scale = {0.5f,0.5f};
+    
 }
 
 Weapon::Weapon(const Weapon& other) :

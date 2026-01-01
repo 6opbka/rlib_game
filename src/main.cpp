@@ -5,8 +5,9 @@
 #include "src/bullet.h"
 #include "src/game_root.h"
 #include "src/sprite_manager.h"
-#include "src/rect_collider.h"
+#include "src/dynamic_rect_collider.h"
 #include "src/level_map.h"
+#include "src/dynamic_circle_collider.h"
 
 
 
@@ -38,8 +39,8 @@ int main() {
     // auto wall_collider = make_unique<DynamicCollider>(Vector2{32.0f,32.0f});
 
     auto player_collider = make_unique<RectCollider>(Vector2{32.0f,32.0f},LAYER_PLAYER,LAYER_ENEMY_BULLET);
-    auto bullet_collider = make_unique<RectCollider>(Vector2{24.0f,16.0f},LAYER_BULLET,LAYER_WALL | LAYER_ENEMY);
-    auto wall_collider = make_unique<RectCollider>(Vector2{32.0f,32.0f},LAYER_WALL,LAYER_NONE);
+    auto bullet_collider = make_unique<DynamicCircleCollider>(Vector2{8.0f,8.0f},LAYER_BULLET,LAYER_WALL | LAYER_ENEMY);
+    auto wall_collider = make_unique<RectCollider>(Vector2{16.0f,16.0f},LAYER_WALL,LAYER_NONE);
     
     
 
@@ -56,7 +57,7 @@ int main() {
     wall->sprite_manager = sprite_manager;
     wall->add_sprite(wall_sprite);
     wall->add_collider(move(wall_collider));
-    wall->local_position = {256.0f,256.0f};
+    wall->local_position = {300.0f,200.0f};
     wall->name = "wall";
   
 

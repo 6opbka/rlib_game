@@ -35,6 +35,9 @@ public:
     const int map_width = 64;
     const int map_height = 64;
     const int tile_size = 16;
+    int pixel_width = 0;
+    int pixel_height = 0;
+
 
     RenderTexture2D render_tex = {0};
     std::vector<std::vector<Line>> islands;

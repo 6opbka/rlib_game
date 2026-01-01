@@ -5,7 +5,7 @@
 #include <iostream>
 #include <cstdint>
 
-const int spatial_collider_grid_size = 64;
+const int spatial_collider_grid_size = 128;
 
 struct Line{
     Vector2 a = {0,0};

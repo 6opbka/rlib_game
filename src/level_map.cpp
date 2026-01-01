@@ -390,6 +390,8 @@ void LevelMap::grid_add_hor_wall(const Line& edge){
 
 
 LevelMap::LevelMap(){
+    pixel_width = map_width*spatial_collider_grid_size;
+    pixel_height = map_height*spatial_collider_grid_size;
 
 }
 LevelMap::~LevelMap(){

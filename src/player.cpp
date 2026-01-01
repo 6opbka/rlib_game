@@ -3,7 +3,7 @@
 #include <iostream>
 
 Player::Player(){
-    scale = {1.0f,1.0f};
+
 
 }
 Player::~Player(){}

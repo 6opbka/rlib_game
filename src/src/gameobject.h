@@ -7,7 +7,7 @@
 #include "sprite_manager.h"
 #include "sprite.h"
 #include "animated_sprite.h"
-#include "rect_collider.h"
+#include "dynamic_rect_collider.h"
 
 class GameRoot;
 class Sprite;

@@ -5,7 +5,13 @@
 #include "static_collider.h"
 
 
+
 class GameObject;
+class RectCollider;
+class DynamicCircleCollider;
+
+class StaticLineCollider;
+
 
 
 
@@ -23,19 +29,24 @@ public:
 
 
     Vector2 position = {0.0f, 0.0f};
-    Vector2 scale = {2.0f, 2.0f};
     Vector2 offset = {0.0f, 0.0f};
 
     std::shared_ptr<GameObject> parent;
 
-    bool can_collide_with (const DynamicCollider& other);
-    bool can_collide_with (const StaticCollider& other);
+    bool can_collide_with (const DynamicCollider& other)const ;
+    bool can_collide_with (const StaticCollider& other)const;
 
 
     virtual bool dynamic_collide(const DynamicCollider& other) = 0;
     virtual bool static_collide (const StaticCollider& other) = 0;
 
-    virtual void calc_collider_shape();
+    virtual bool collide_with_rect(const RectCollider& other)const = 0;
+    virtual bool collide_with_circle(const DynamicCircleCollider& other)const= 0;
+    
+    virtual bool collide_with_static_line (const StaticLineCollider& other) = 0;
+
+
+    virtual void calc_collider_shape() const ;
     virtual void on_parent_added();
     virtual void draw() = 0;
 

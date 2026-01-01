@@ -14,7 +14,7 @@ public:
     Camera2D camera ={0};
     Vector2 offset = {0.0f,0.0f};
     float rotation = 0.0f;
-    float zoom = 1.0f;
+    float zoom = 3.0f;
 
     shared_ptr<GameObject> target;
 

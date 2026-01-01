@@ -4,17 +4,51 @@
 #include <algorithm>
 
 GameRoot::GameRoot(){
-    scale = {4.0f,4.0f};
+    
     name = "game_root";
     dynamic_grid.resize(map.map_height*map.map_width);
     cout<<"dynamic_grid size: "<<dynamic_grid.size()<<"\n";
 }
 GameRoot::~GameRoot(){}
 
+inline Cell GameRoot::world_to_grid(Vector2 world) {
+    const float half_w =
+        map.map_width * spatial_collider_grid_size * 0.5f;
+    const float half_h =
+        map.map_height * spatial_collider_grid_size * 0.5f;
+
+    Cell cell;
+    cell.x = static_cast<int>((world.x + half_w)
+                              / spatial_collider_grid_size);
+    cell.y = static_cast<int>((world.y + half_h)
+                              / spatial_collider_grid_size);
+
+    return cell;
+}
+
+inline Vector2 GameRoot::grid_to_world(Cell grid) {
+    const float half_w =
+        map.map_width * spatial_collider_grid_size * 0.5f;
+    const float half_h =
+        map.map_height * spatial_collider_grid_size * 0.5f;
+
+    return {
+        grid.x * spatial_collider_grid_size
+            - half_w
+            + spatial_collider_grid_size * 0.5f,
+
+        grid.y * spatial_collider_grid_size
+            - half_h
+            + spatial_collider_grid_size * 0.5f
+    };
+}
+
 void GameRoot::update(const float delta_time) {
     // Add pending children first
     update_mouse_pos();
-    grid.clear();
+    for(auto& cell: dynamic_grid){
+        cell.clear();
+    }
     if (!pending_children.empty()) {
         for (auto& child : pending_children) {
             children.push_back(child);
@@ -27,7 +61,7 @@ void GameRoot::update(const float delta_time) {
     for (auto& child : children) {
         if (!child) return;
         child->update(delta_time);
-        grid_add_object(child);
+        add_dynamic_object(child);
     }
     camera->update(delta_time);
     check_collisions_in_grid();
@@ -36,15 +70,43 @@ void GameRoot::update(const float delta_time) {
     // cout<<"num of objects: "<<num_of_objects<<endl;
 }
 
-void GameRoot::render(const float delta_time){\
+void GameRoot::render(const float delta_time) {
     camera->cam_begin();
+
     for (auto& child : children) {
-        if (child){
-            
+        if (child) {
             child->render(delta_time);
-            
-        } 
+        }
     }
+
+    const float half_w =
+        map.map_width * spatial_collider_grid_size * 0.5f;
+    const float half_h =
+        map.map_height * spatial_collider_grid_size * 0.5f;
+
+    for (int index : debug_cells) {
+        int x = index % map.map_width;
+        int y = index / map.map_width;
+
+        float wx =
+            x * spatial_collider_grid_size
+            - half_w
+            + spatial_collider_grid_size * 0.5f;
+
+        float wy =
+            y * spatial_collider_grid_size
+            - half_h
+            + spatial_collider_grid_size * 0.5f;
+
+        DrawRectangleLines(
+            wx - spatial_collider_grid_size * 0.5f,
+            wy - spatial_collider_grid_size * 0.5f,
+            spatial_collider_grid_size,
+            spatial_collider_grid_size,
+            RED
+        );
+    }
+
     camera->cam_end();
 }
 
@@ -61,51 +123,90 @@ shared_ptr<GameObject> GameRoot::clone() const{
     return nullptr;
 }
 
-void GameRoot::grid_add_object(shared_ptr<GameObject> object) {
+void GameRoot::add_dynamic_object(std::shared_ptr<GameObject> object) {
     if (!object) return;
-    int _x = static_cast<int>(object->local_position.x / spatial_collider_grid_size);
-    int _y = static_cast<int>(object->local_position.y / spatial_collider_grid_size);
-    Cell cell_coord = { _x, _y };
-    grid[cell_coord].push_back(object);
+
+    Vector2 world = object->get_world_position();
+    cout<<"world:"<<world<<"\n";
+    Cell c = world_to_grid(world);
+
+    if (c.x < 0 || c.y < 0 ||
+        c.x >= map.map_width ||
+        c.y >= map.map_height)
+        return;
+
+    dynamic_grid[c.y * map.map_width + c.x]
+        .push_back(object.get());
 }
 
+
 void GameRoot::check_collisions_in_grid() {
-    std::set<std::pair<GameObject*, GameObject*>> checked;
     int collision_checks = 0;
+    debug_cells.clear();
+    // Только "вперёд"
+    static const int offsets[][2] = {
+        {0, 0},
+        {1, 0},
+        {0, 1},
+        {1, 1},
+        {-1, 1}
+    };
 
-    for (const auto& [cell, objects] : grid) {
-        for (const auto& obj_sp : objects) {
+    for (int index = 0; index < dynamic_grid.size(); ++index) {
+        auto& objects = dynamic_grid[index];
+        if (objects.empty()) continue;
+        debug_cells.push_back(index);
 
-            GameObject* obj = obj_sp.get();
+        int x = index % map.map_width;
+        int y = index / map.map_width;
+        
+
+        for (int i = 0; i < objects.size(); ++i) {
+            GameObject* obj = objects[i];
             if (!obj || !obj->collider) continue;
 
-            for (int dx = -1; dx <= 1; ++dx) {
-                for (int dy = -1; dy <= 1; ++dy) {
+            for (auto& o : offsets) {
+                int nx = x + o[0];
+                int ny = y + o[1];
 
-                    Cell neighbour = {
-                        cell.x + dx,
-                        cell.y + dy
-                    };
+                if (nx < 0 || ny < 0 ||
+                    nx >= map.map_width ||
+                    ny >= map.map_height)
+                    continue;
+                
 
-                    auto it = grid.find(neighbour);
-                    if (it == grid.end()) continue;
+                auto& neighbour_cell =
+                    dynamic_grid[ny * map.map_width + nx];
 
-                    for (const auto& other_sp : it->second) {
+                if (neighbour_cell.empty()) continue;
 
-                        GameObject* other = other_sp.get();
-                        if (!other || !other->collider || obj == other) continue;
+                // Та же ячейка — только i+1
+                if (o[0] == 0 && o[1] == 0) {
+                    for (int j = i + 1; j < neighbour_cell.size(); ++j) {
+                        GameObject* other = neighbour_cell[j];
+                        if (!other || !other->collider) continue;
 
-                        auto pair = std::minmax(obj, other);
-                        if (checked.insert(pair).second) {
-                            obj->check_collision_dynamic(*other);
-                            collision_checks++;
-                        }
+                        obj->check_collision_dynamic(*other);
+                        collision_checks++;
+                    }
+                }
+                // Соседние ячейки — все объекты
+                else {
+                    for (GameObject* other : neighbour_cell) {
+                        if (!other || !other->collider) continue;
+
+                        obj->check_collision_dynamic(*other);
+                        collision_checks++;
                     }
                 }
             }
         }
     }
+    
+    // std::cout << "collision checks: " << collision_checks << std::endl;
 }
+
+
 
 
 
@@ -133,6 +234,7 @@ void GameRoot::add_cam(shared_ptr<Cam> cam){
 
 void GameRoot::init_map(){
     map.gen_map();
+    
     Texture2D map_tex = map.create_texture();
     map.calculate_colliders();
     map_tex = map.redraw_colliders_as_tex();
@@ -140,6 +242,7 @@ void GameRoot::init_map(){
     auto map_sprite = sprite_manager->make_sprite(map_ref,{0,0},{16.0f*64,16.0f*64});
     map.grid_add_colliders();
     auto map_ = make_shared<GameObject>();
+    // map_->scale = {2.0f,2.0f};
     map_->name = "map";
     map_->sprite_manager = sprite_manager;
     map_->add_sprite(map_sprite);
