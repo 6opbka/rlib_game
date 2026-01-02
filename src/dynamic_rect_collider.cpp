@@ -16,16 +16,18 @@ RectCollider::~RectCollider(){}
 
 
 Rectangle RectCollider::get_collider_rec() const {
-    Vector2 world = parent->get_world_position();
+    auto p = get_parent();
+    if(!p) return{0,0,0,0};
+    Vector2 world = p->get_world_position();
 
     Vector2 scaledSize = {
-        size.x * parent->scale.x,
-        size.y * parent->scale.y
+        size.x * p->scale.x,
+        size.y * p->scale.y
     };
 
     Vector2 scaledOffset = {
-        offset.x * parent->scale.x,
-        offset.y * parent->scale.y
+        offset.x * p->scale.x,
+        offset.y * p->scale.y
     };
 
     Vector2 center = {
@@ -59,20 +61,28 @@ void RectCollider::draw() {
     auto r = get_collider_rec();
     DrawCircleV({r.x, r.y}, 3, GREEN);               // top-left
     DrawCircleV({r.x+r.width, r.y+r.height}, 3, BLUE); // bottom-right
-    DrawCircleV(parent->get_world_position(), 3, YELLOW); // центр
+   
     DrawRectangleLinesEx(get_collider_rec(), 1.0f, RED);
+
+    if(auto p = get_parent()) DrawCircleV(p->get_world_position(), 3, YELLOW); // центр
+
+    
     // DrawCircleV(parent->get_world_position(), 4, BLUE);
 
 }
 
 void RectCollider::on_parent_added(){
-    if (!parent) {cout<<"no parent"<<endl; return;}
+
+    
+    // if (!parent) {cout<<"no parent"<<endl; return;}
     // scale = {parent->scale.x * scale.x, parent->scale.y * scale.y};
     // cout<<scale<<"\n";
 }
 
 bool RectCollider::dynamic_collide(const DynamicCollider& other) {
+
     if (!can_collide_with(other)) return false;
+    
     return other.collide_with_rect(*this);
 }
 
@@ -91,9 +101,10 @@ bool RectCollider::static_collide (const StaticCollider& other) {
 
 
 bool RectCollider::collide_with_rect(const RectCollider& other) const {
+    
     return CheckCollisionRecs(
-        get_collider_rec(),
-        other.get_collider_rec()
+        other.get_collider_rec(),
+        get_collider_rec()
     );
 }
 
@@ -105,4 +116,11 @@ bool RectCollider::collide_with_circle(const DynamicCircleCollider& other) const
 bool RectCollider::collide_with_static_line (const StaticLineCollider& other) {
     return false;
 }
+
+Rectangle RectCollider::get_aabb_world() const {
+    return get_collider_rec();
+}
+
+
+
 

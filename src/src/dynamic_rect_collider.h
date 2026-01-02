@@ -15,6 +15,7 @@ public:
     Vector2 size = {16.0f,16.0f};
     bool can_draw = false;
 
+
     RectCollider(Vector2 size_, CollisionLayer col_layer,CollisionLayer col_mask);
     ~RectCollider();
 
@@ -27,7 +28,7 @@ public:
 
     bool collide_with_static_line (const StaticLineCollider& other) override;
 
-
+    Rectangle get_aabb_world() const override;
 
 
     ColliderShape get_col_shape() const override;

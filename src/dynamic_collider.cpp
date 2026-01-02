@@ -11,7 +11,8 @@ DynamicCollider::DynamicCollider(CollisionLayer col_layer,CollisionLayer col_mas
 
 
 void DynamicCollider::calc_collider_shape() const {
-    if (!parent) {
+    auto p = get_parent();
+    if (!p) {
         cout << "no parent\n";
         return;
     }
@@ -19,7 +20,8 @@ void DynamicCollider::calc_collider_shape() const {
 }
 
 void DynamicCollider::on_parent_added(){
-    if (!parent) cout<<"no parent"<<endl; return;
+    auto p = get_parent();
+    if (!p) cout<<"no parent"<<endl; return;
     // scale = {parent->scale.x * scale.x, parent->scale.y * scale.x};
     cout<<"scale ";
     // cout<<scale<<"\n";
@@ -40,4 +42,8 @@ bool DynamicCollider::can_collide_with(const StaticCollider& other)const {
 
 ColliderShape DynamicCollider::get_col_shape() const{
     return collider_shape;
+}
+
+std::shared_ptr<GameObject> DynamicCollider::get_parent() const {
+    return parent.lock();
 }

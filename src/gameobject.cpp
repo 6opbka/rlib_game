@@ -111,7 +111,6 @@ void GameObject::check_collision_dynamic(GameObject& target) {
     }
 
     if(collider->dynamic_collide(*target.collider)){
-        // cout<<"Pepe\n";
         this->on_collision();
         target.on_collision();
     }
@@ -157,3 +156,4 @@ shared_ptr<GameRoot> GameObject::get_root(){
     if(!r) return NULL;
     return r;
 }
+

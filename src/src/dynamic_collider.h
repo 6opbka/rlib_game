@@ -31,7 +31,7 @@ public:
     Vector2 position = {0.0f, 0.0f};
     Vector2 offset = {0.0f, 0.0f};
 
-    std::shared_ptr<GameObject> parent;
+    std::weak_ptr<GameObject> parent;
 
     bool can_collide_with (const DynamicCollider& other)const ;
     bool can_collide_with (const StaticCollider& other)const;
@@ -49,6 +49,10 @@ public:
     virtual void calc_collider_shape() const ;
     virtual void on_parent_added();
     virtual void draw() = 0;
+    virtual Rectangle get_aabb_world() const = 0;
+
+    std::shared_ptr<GameObject> get_parent() const;
+
 
     virtual ColliderShape get_col_shape() const;    
 

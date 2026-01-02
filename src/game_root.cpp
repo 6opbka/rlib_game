@@ -53,7 +53,6 @@ void GameRoot::update(const float delta_time) {
         for (auto& child : pending_children) {
             children.push_back(child);
             num_of_objects ++;
-    
         }
         pending_children.clear();
     }
@@ -124,20 +123,31 @@ shared_ptr<GameObject> GameRoot::clone() const{
 }
 
 void GameRoot::add_dynamic_object(std::shared_ptr<GameObject> object) {
-    if (!object) return;
+    if (!object || !object->collider) return;
 
-    Vector2 world = object->get_world_position();
-    cout<<"world:"<<world<<"\n";
-    Cell c = world_to_grid(world);
+    Rectangle aabb = object->collider->get_aabb_world();
 
-    if (c.x < 0 || c.y < 0 ||
-        c.x >= map.map_width ||
-        c.y >= map.map_height)
-        return;
+    Cell minC = world_to_grid({ aabb.x, aabb.y });
+    Cell maxC = world_to_grid({
+        aabb.x + aabb.width  - 0.001f,
+        aabb.y + aabb.height - 0.001f
+    });
 
-    dynamic_grid[c.y * map.map_width + c.x]
-        .push_back(object.get());
+    for (int y = minC.y; y <= maxC.y; ++y) {
+        for (int x = minC.x; x <= maxC.x; ++x) {
+
+            if (x < 0 || y < 0 ||
+                x >= map.map_width ||
+                y >= map.map_height)
+                continue;
+
+            dynamic_grid[y * map.map_width + x]
+                .push_back(object.get());
+        }
+    }
 }
+
+
 
 
 void GameRoot::check_collisions_in_grid() {
@@ -236,10 +246,11 @@ void GameRoot::init_map(){
     map.gen_map();
     
     Texture2D map_tex = map.create_texture();
-    map.calculate_colliders();
+    map.calculate_edges();
     map_tex = map.redraw_colliders_as_tex();
     auto map_ref = make_shared<Texture2D>(map_tex);
     auto map_sprite = sprite_manager->make_sprite(map_ref,{0,0},{16.0f*64,16.0f*64});
+    map.generate_collider_list();
     map.grid_add_colliders();
     auto map_ = make_shared<GameObject>();
     // map_->scale = {2.0f,2.0f};

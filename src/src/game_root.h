@@ -34,6 +34,7 @@ public:
 
     
     void add_dynamic_object(shared_ptr<GameObject> object);
+    
     void check_collisions_in_grid();
 
     void add_cam(shared_ptr<Cam> cam);
@@ -44,6 +45,8 @@ public:
     
     inline Cell world_to_grid(Vector2 world);
     inline Vector2 grid_to_world(Cell grid);
+
+
 
 
     shared_ptr<GameObject> instantiate(shared_ptr<GameObject> object);

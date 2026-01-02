@@ -39,11 +39,9 @@ int main() {
     // auto wall_collider = make_unique<DynamicCollider>(Vector2{32.0f,32.0f});
 
     auto player_collider = make_unique<RectCollider>(Vector2{32.0f,32.0f},LAYER_PLAYER,LAYER_ENEMY_BULLET);
-    auto bullet_collider = make_unique<DynamicCircleCollider>(Vector2{8.0f,8.0f},LAYER_BULLET,LAYER_WALL | LAYER_ENEMY);
-    auto wall_collider = make_unique<RectCollider>(Vector2{16.0f,16.0f},LAYER_WALL,LAYER_NONE);
+    auto bullet_collider = make_unique<DynamicCircleCollider>(Vector2{4.0f,4.0f},LAYER_BULLET,LAYER_WALL | LAYER_ENEMY);
+    auto wall_collider = make_unique<RectCollider>(Vector2{16.0f,16.0f},LAYER_WALL,LAYER_BULLET | LAYER_PLAYER | LAYER_ENEMY);
     
-    
-
     cout<<player_sprite2<<"\n";
 
     auto bullet = make_shared<Bullet>();
@@ -57,7 +55,7 @@ int main() {
     wall->sprite_manager = sprite_manager;
     wall->add_sprite(wall_sprite);
     wall->add_collider(move(wall_collider));
-    wall->local_position = {300.0f,200.0f};
+    wall->local_position = {150.0f,90.0f};
     wall->name = "wall";
   
 

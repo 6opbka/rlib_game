@@ -4,6 +4,9 @@
 #include <cstdlib>
 #include <map>
 #include <algorithm>
+#include <memory>
+#include "src/static_line_collider.h"
+#include "src/static_collider.h"
 
 using namespace std;
 
@@ -131,7 +134,7 @@ Texture2D LevelMap::create_texture(){
     return render_tex.texture;
 }
 
-void LevelMap::calculate_colliders(){
+void LevelMap::calculate_edges(){
     vector<bool> visited(map_height*map_width);
 
     // Calculating raw_islands 
@@ -232,26 +235,35 @@ void LevelMap::calculate_colliders(){
             }
         }
 
-        
-
         for(auto& [y, edges] : hor_edges){
             merge_collinear(edges,all_edges_hor,true);
         }
         for(auto& [x,edges] : ver_edges){
             merge_collinear(edges,all_edges_ver,false);
         }
-
-
     }
-
     cout<<"num raw_islands: "<<raw_islands.size()<<endl;
     cout<<"num islands: "<<islands.size()<<endl;
-    cout<<"num all_edges_hor: "<<all_edges_hor.size()<<endl;
-    cout<<"num all_edges_ver: "<<all_edges_ver.size()<<endl;
-
-
 
 }
+
+void LevelMap::generate_collider_list(){
+    for(Line& edge:all_edges_ver){
+        std::unique_ptr<StaticLineCollider> col = make_unique<StaticLineCollider>(LAYER_WALL,LAYER_NONE,LINE,edge);
+        static_colliders.push_back(std::move(col));
+    }
+
+    for(Line& edge:all_edges_hor){
+        std::unique_ptr<StaticLineCollider> col = make_unique<StaticLineCollider>(LAYER_WALL,LAYER_NONE,LINE,edge);
+        static_colliders.push_back(std::move(col));
+    }
+
+    cout<<"num all_edges_hor: "<<all_edges_hor.size()<<endl;
+    cout<<"num all_edges_ver: "<<all_edges_ver.size()<<endl;
+    cout<<"num colliders: "<<static_colliders.size()<<endl;
+
+}
+
 
 Texture2D LevelMap::redraw_colliders_as_tex(){
     
@@ -285,16 +297,13 @@ Texture2D LevelMap::redraw_colliders_as_tex(){
     }
     for (const auto& edge : all_edges_hor) {
     
-
     unsigned char r = (unsigned char)((i * 50) % 256);
     unsigned char g = (unsigned char)((i * 80) % 256);
     unsigned char b = (unsigned char)((i * 110) % 256);
-
     Color c = { r, g, b, 255 };
 
     DrawLineV(edge.a, edge.b, c);
     i++;
-    
     }
     EndTextureMode();
     return render_tex.texture;
@@ -334,7 +343,6 @@ void LevelMap::merge_collinear(vector<Line>& edges, vector<Line>& merged, bool h
             current = edges[i];
         }
     }
-
     merged.push_back(current);
 }
 
@@ -345,10 +353,8 @@ void LevelMap::grid_add_colliders(){
     for(const Line& edge: all_edges_ver){
         grid_add_vert_wall(edge);
     }
-    
-
     cout<<"Cell num: "<<static_grid.size()<<endl;
-
+    
 }
 
 void LevelMap::grid_add_vert_wall(const Line& edge){
@@ -362,12 +368,12 @@ void LevelMap::grid_add_vert_wall(const Line& edge){
     int y_start = floor(y0/ spatial_collider_grid_size);
     int y_end   = floor(y1 / spatial_collider_grid_size);
 
+
+
     for (int y = y_start; y <= y_end; ++y) {
-        static_grid[{cell_x, y}].push_back(edge);
+        // static_grid[{cell_x, y}].push_back(edge);
     }
-
 }
-
 
 
 void LevelMap::grid_add_hor_wall(const Line& edge){
@@ -383,7 +389,7 @@ void LevelMap::grid_add_hor_wall(const Line& edge){
     int x_end   = floor(x1 / spatial_collider_grid_size);
 
     for (int y = x_start; y <= x_end; ++y) {
-        static_grid[{cell_y, y}].push_back(edge);
+        // static_grid[{cell_y, y}].push_back(edge);
     }
 
 }

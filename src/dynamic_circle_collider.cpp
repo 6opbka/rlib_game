@@ -14,18 +14,22 @@ DynamicCircleCollider::~DynamicCircleCollider()
 }
 
 void DynamicCircleCollider::draw() {
-    DrawCircleLinesV(parent->get_world_position(), radius, RED);
-    DrawCircleV(parent->get_world_position(), 4, BLUE);
-
+    if(auto p = get_parent()){
+        DrawCircleLinesV(p->get_world_position(), radius, RED);
+        DrawCircleV(p->get_world_position(), 4, BLUE);
+    }
 }
 
 Vector2 DynamicCircleCollider::get_position()const{
-    Vector2 pos = parent->get_world_position();
-    float size_ = radius*parent->scale.x;
+    auto p = get_parent();
+    if(!p) return {0,0};
+    
+    Vector2 pos = p->get_world_position();
+    float size_ = radius*p->scale.x;
 
     return {
-        pos.x + offset.x * parent->scale.x - size_ * 0.5f,
-        pos.y + offset.y * parent->scale.y - size_ * 0.5f,
+        pos.x + offset.x * p->scale.x - size_ * 0.5f,
+        pos.y + offset.y * p->scale.y - size_ * 0.5f,
     };
 }
 
@@ -60,4 +64,17 @@ std::unique_ptr<DynamicCollider> DynamicCircleCollider::clone() const{
     new_collider->layer = this->layer;
     new_collider->mask = this->mask;
     return new_collider; // Performs a shallow copy
+}
+
+Rectangle DynamicCircleCollider::get_aabb_world() const {
+    if(auto p = get_parent()){
+        Vector2 world_pos = p->get_world_position();
+        return {
+            world_pos.x - radius,
+            world_pos.y - radius,
+            radius * 2.0f,
+            radius * 2.0f
+        };
+    }
+    return {0,0,0,0};
 }

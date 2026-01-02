@@ -22,6 +22,6 @@ public:
     bool collide_with_rect(const RectCollider& other) const;
     bool collide_with_circle(const DynamicCircleCollider& other)const;
     bool collide_with_static_line(const StaticLineCollider& other);
-
+    Rectangle get_aabb_world() const override;
     std::unique_ptr<DynamicCollider> clone() const;
 };

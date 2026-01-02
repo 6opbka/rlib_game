@@ -3,10 +3,11 @@
 #include <fstream>
 #include <vector>
 #include <unordered_map>
-
 #include "utility.hpp"
+#include <memory>
 
 
+class StaticCollider;
 
 class LevelMap 
 {
@@ -26,9 +27,14 @@ public:
     Texture2D create_texture();
     Texture2D redraw_colliders_as_tex();
     
-    void calculate_colliders();
+    void calculate_edges();
+    void generate_collider_list();
 
-    std::unordered_map<Cell,std::vector<Line>,CellCoordHash> static_grid;
+    
+
+    
+    std::vector<std::unique_ptr<StaticCollider>> static_colliders;
+    std::vector<std::vector<StaticCollider*>> static_grid;
     void grid_add_colliders();
     
     std::vector<int> map_vec;
@@ -38,9 +44,9 @@ public:
     int pixel_width = 0;
     int pixel_height = 0;
 
-
     RenderTexture2D render_tex = {0};
     std::vector<std::vector<Line>> islands;
     std::vector<Line> all_edges_hor;
     std::vector<Line> all_edges_ver;
+
 };
