@@ -343,6 +343,12 @@ void LevelMap::merge_collinear(vector<Line>& edges, vector<Line>& merged, bool h
             current = edges[i];
         }
     }
+    // calculating length
+    float dist_x = current.a.x-current.b.x;
+    float dist_y = current.a.y-current.b.y;
+    float len = sqrt((dist_x*dist_x)+(dist_y*dist_y));
+    cout<<len<<endl;
+    current.length = len;
     merged.push_back(current);
 }
 

@@ -1,26 +1,24 @@
 #ifndef RAYLIB_CPP_INCLUDE_MODELANIMATION_HPP_
 #define RAYLIB_CPP_INCLUDE_MODELANIMATION_HPP_
 
-#include <vector>
 #include <string>
+#include <vector>
 
-#include "./raylib.hpp"
-#include "./raylib-cpp-utils.hpp"
 #include "./Mesh.hpp"
+#include "./raylib-cpp-utils.hpp"
+#include "./raylib.hpp"
 
 namespace raylib {
 /**
  * Model animation
  */
 class ModelAnimation : public ::ModelAnimation {
- public:
-    ModelAnimation(const ::ModelAnimation& model) {
-        set(model);
-    }
+public:
+    ModelAnimation(const ::ModelAnimation& model) { set(model); }
 
     ModelAnimation(const ModelAnimation&) = delete;
 
-    ModelAnimation(ModelAnimation&& other) {
+    ModelAnimation(ModelAnimation&& other) noexcept {
         set(other);
 
         other.boneCount = 0;
@@ -29,9 +27,7 @@ class ModelAnimation : public ::ModelAnimation {
         other.framePoses = nullptr;
     }
 
-    ~ModelAnimation() {
-        Unload();
-    }
+    ~ModelAnimation() { Unload(); }
 
     /**
      * Load model animations from file
@@ -77,9 +73,7 @@ class ModelAnimation : public ::ModelAnimation {
     /**
      * Unload animation data
      */
-    void Unload() {
-        ::UnloadModelAnimation(*this);
-    }
+    void Unload() { ::UnloadModelAnimation(*this); }
 
     /**
      * Update model animation pose
@@ -90,13 +84,18 @@ class ModelAnimation : public ::ModelAnimation {
     }
 
     /**
-     * Check model animation skeleton match
+     * Update model animation mesh bone matrices (GPU skinning)
      */
-    bool IsValid(const ::Model& model) const {
-        return ::IsModelAnimationValid(model, *this);
+    ModelAnimation& UpdateBones(const ::Model& model, int frame) {
+        ::UpdateModelAnimationBones(model, *this, frame);
+        return *this;
     }
 
- protected:
+    /**
+     * Check model animation skeleton match
+     */
+    [[nodiscard]] bool IsValid(const ::Model& model) const { return ::IsModelAnimationValid(model, *this); }
+protected:
     void set(const ::ModelAnimation& model) {
         boneCount = model.boneCount;
         frameCount = model.frameCount;
@@ -109,8 +108,8 @@ class ModelAnimation : public ::ModelAnimation {
         }
     }
 };
-}  // namespace raylib
+} // namespace raylib
 
 using RModelAnimation = raylib::ModelAnimation;
 
-#endif  // RAYLIB_CPP_INCLUDE_MODELANIMATION_HPP_
+#endif // RAYLIB_CPP_INCLUDE_MODELANIMATION_HPP_

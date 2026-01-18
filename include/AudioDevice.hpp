@@ -1,16 +1,16 @@
 #ifndef RAYLIB_CPP_INCLUDE_AUDIODEVICE_HPP_
 #define RAYLIB_CPP_INCLUDE_AUDIODEVICE_HPP_
 
-#include "./raylib.hpp"
-#include "./raylib-cpp-utils.hpp"
 #include "./RaylibException.hpp"
+#include "./raylib-cpp-utils.hpp"
+#include "./raylib.hpp"
 
 namespace raylib {
 /**
  * Audio device management functions.
  */
 class AudioDevice {
- public:
+public:
     /**
      * Initialize audio device and context.
      *
@@ -18,7 +18,7 @@ class AudioDevice {
      *
      * @throws raylib::RaylibException Throws if the AudioDevice failed to initialize.
      */
-    AudioDevice(bool lateInit = false) {
+    explicit AudioDevice(bool lateInit = false) {
         if (!lateInit) {
             Init();
         }
@@ -27,16 +27,14 @@ class AudioDevice {
     /**
      * Close the audio device and context.
      */
-    ~AudioDevice() {
-        Close();
-    }
+    ~AudioDevice() { Close(); }
 
     /**
      * Initialize audio device and context.
      *
      * @throws raylib::RaylibException Throws if the AudioDevice failed to initialize.
      */
-    void Init() {
+    static void Init()  {
         ::InitAudioDevice();
         if (!IsReady()) {
             throw RaylibException("Failed to initialize AudioDevice");
@@ -46,16 +44,12 @@ class AudioDevice {
     /**
      * Close the audio device and context.
      */
-    void Close() {
-        ::CloseAudioDevice();
-    }
+    static void Close() { ::CloseAudioDevice(); }
 
     /**
      * Check if audio device has been initialized successfully.
      */
-    bool IsReady() const {
-        return ::IsAudioDeviceReady();
-    }
+    static bool IsReady()  { return ::IsAudioDeviceReady(); }
 
     /**
      * Set master volume (listener).
@@ -67,8 +61,8 @@ class AudioDevice {
         return *this;
     }
 };
-}  // namespace raylib
+} // namespace raylib
 
 using RAudioDevice = raylib::AudioDevice;
 
-#endif  // RAYLIB_CPP_INCLUDE_AUDIODEVICE_HPP_
+#endif // RAYLIB_CPP_INCLUDE_AUDIODEVICE_HPP_

@@ -4,11 +4,10 @@
 #include <string>
 #include <vector>
 
-#include "./raylib.hpp"
-#include "./raylib-cpp-utils.hpp"
-#include "./BoundingBox.hpp"
-#include "./Model.hpp"
 #include "./MeshUnmanaged.hpp"
+#include "./Model.hpp"
+#include "./raylib-cpp-utils.hpp"
+#include "./raylib.hpp"
 
 namespace raylib {
 /**
@@ -19,7 +18,7 @@ namespace raylib {
  * @see raylib::MeshUnmanaged
  */
 class Mesh : public MeshUnmanaged {
- public:
+public:
     using MeshUnmanaged::MeshUnmanaged;
 
     /**
@@ -35,7 +34,7 @@ class Mesh : public MeshUnmanaged {
     /**
      * Move constructor.
      */
-    Mesh(Mesh&& other) {
+    Mesh(Mesh&& other) noexcept {
         set(other);
 
         other.vertexCount = 0;
@@ -82,12 +81,10 @@ class Mesh : public MeshUnmanaged {
         return *this;
     }
 
-    ~Mesh() {
-        Unload();
-    }
+    ~Mesh() { Unload(); }
 };
-}  // namespace raylib
+} // namespace raylib
 
 using RMesh = raylib::Mesh;
 
-#endif  // RAYLIB_CPP_INCLUDE_MESH_HPP_
+#endif // RAYLIB_CPP_INCLUDE_MESH_HPP_

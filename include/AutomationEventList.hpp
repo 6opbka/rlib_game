@@ -1,39 +1,36 @@
 #ifndef RAYLIB_CPP_INCLUDE_AUTOMATIONEVENTLIST_HPP_
 #define RAYLIB_CPP_INCLUDE_AUTOMATIONEVENTLIST_HPP_
 
-#include "./raylib.hpp"
-#include "./raylib-cpp-utils.hpp"
 #include "./RaylibException.hpp"
+#include "./raylib-cpp-utils.hpp"
+#include "./raylib.hpp"
 
 namespace raylib {
 /**
  * AutomationEventList management functions
  */
 class AutomationEventList : public ::AutomationEventList {
- public:
-    AutomationEventList(const ::AutomationEventList& automationEventList) {
-        set(automationEventList);
+public:
+    AutomationEventList(const ::AutomationEventList& automationEventList)
+        : ::AutomationEventList(automationEventList) {
+        // Nothing.
     }
 
     /**
      * Load an empty automation events list.
      */
-    AutomationEventList() {
-        set(::LoadAutomationEventList(0));
-    }
+    AutomationEventList() { set(::LoadAutomationEventList(0)); }
 
     /**
      * Load automation events list from file.
      *
      * @param fileName The file path to load the automation events list from.
      */
-    AutomationEventList(const char* fileName) {
-        Load(fileName);
-    }
+    AutomationEventList(const char* fileName) { Load(fileName); }
 
     AutomationEventList(const AutomationEventList&) = delete;
 
-    AutomationEventList(AutomationEventList&& other) {
+    AutomationEventList(AutomationEventList&& other) noexcept {
         set(other);
 
         other.capacity = 0;
@@ -41,9 +38,7 @@ class AutomationEventList : public ::AutomationEventList {
         other.events = nullptr;
     }
 
-    ~AutomationEventList() {
-        Unload();
-    }
+    ~AutomationEventList() { Unload(); }
 
     GETTER(unsigned int, Capacity, capacity)
     GETTER(unsigned int, Count, count)
@@ -79,7 +74,7 @@ class AutomationEventList : public ::AutomationEventList {
     void Load(const char* fileName) {
         Unload();
         set(::LoadAutomationEventList(fileName));
-        if (!IsReady()) {
+        if (!IsValid()) {
             throw RaylibException("Failed to load automation event list");
         }
     }
@@ -88,33 +83,27 @@ class AutomationEventList : public ::AutomationEventList {
      * Update audio stream buffers with data
      */
     void Unload() {
-        if (!IsReady()) {
+        if (!IsValid()) {
             return;
         }
 
-        // The function signature of UnloadAutomationEventList() changes from raylib 5.0.
-        #if RAYLIB_VERSION_MAJOR == 5
-            #if RAYLIB_VERSION_MINOR == 0
-                ::UnloadAutomationEventList(this);
-            #elif RAYLIB_VERSION_MINOR >= 1
-                ::UnloadAutomationEventList(*this);
-            #endif
-        #else
-            ::UnloadAutomationEventList(*this);
-        #endif
+// The function signature of UnloadAutomationEventList() changes from raylib 5.0.
+#if RAYLIB_VERSION_MAJOR == 5
+#if RAYLIB_VERSION_MINOR == 0
+        ::UnloadAutomationEventList(this);
+#elif RAYLIB_VERSION_MINOR >= 1
+        ::UnloadAutomationEventList(*this);
+#endif
+#else
+        ::UnloadAutomationEventList(*this);
+#endif
     }
 
-    bool IsReady() {
-        return events != nullptr;
-    }
+    bool IsValid() { return events != nullptr; }
 
-    bool Export(const char* fileName) {
-        return ::ExportAutomationEventList(*this, fileName);
-    }
+    bool Export(const char* fileName) { return ::ExportAutomationEventList(*this, fileName); }
 
-    void Set() {
-        ::SetAutomationEventList(this);
-    }
+    void Set() { ::SetAutomationEventList(this); }
 
     void SetBaseFrame(int frame) {
         Set();
@@ -139,16 +128,15 @@ class AutomationEventList : public ::AutomationEventList {
         Set();
         ::PlayAutomationEvent(this->events[index]);
     }
-
- protected:
+protected:
     void set(const ::AutomationEventList& other) {
         capacity = other.capacity;
         count = other.count;
         events = other.events;
     }
 };
-}  // namespace raylib
+} // namespace raylib
 
 using RAutomationEventList = raylib::AutomationEventList;
 
-#endif  // RAYLIB_CPP_INCLUDE_AUTOMATIONEVENTLIST_HPP_
+#endif // RAYLIB_CPP_INCLUDE_AUTOMATIONEVENTLIST_HPP_

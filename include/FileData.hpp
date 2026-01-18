@@ -4,13 +4,13 @@
 #include <string>
 #include <utility>
 
-#include "./raylib.hpp"
 #include "./raylib-cpp-utils.hpp"
+#include "./raylib.hpp"
 
 namespace raylib {
 
 class FileData {
- public:
+public:
     FileData() = default;
     FileData(const FileData&) = delete;
     FileData(FileData&& other) noexcept : data(other.data), bytesRead(other.bytesRead) {
@@ -25,15 +25,14 @@ class FileData {
     }
     ~FileData() { Unload(); }
 
-    explicit FileData(const std::string& fileName) {
-        Load(fileName);
-    }
+    explicit FileData(const std::string& fileName) { Load(fileName); }
 
     GETTER(const unsigned char*, Data, data)
     GETTER(int, BytesRead, bytesRead)
 
     void Load(const std::string& fileName) { Load(fileName.c_str()); }
     void Load(const char* fileName) {
+        Unload();
         data = ::LoadFileData(fileName, &bytesRead);
     }
 
@@ -41,16 +40,16 @@ class FileData {
         if (data != nullptr) {
             ::UnloadFileData(data);
             data = nullptr;
+            bytesRead = 0;
         }
     }
-
- private:
+private:
     unsigned char* data{nullptr};
     int bytesRead{0};
 };
 
-}  // namespace raylib
+} // namespace raylib
 
 using RFileData = raylib::FileData;
 
-#endif  // RAYLIB_CPP_INCLUDE_FILEDATA_HPP_
+#endif // RAYLIB_CPP_INCLUDE_FILEDATA_HPP_

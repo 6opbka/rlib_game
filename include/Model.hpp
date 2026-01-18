@@ -3,9 +3,9 @@
 
 #include <string>
 
-#include "./raylib.hpp"
-#include "./raylib-cpp-utils.hpp"
 #include "./RaylibException.hpp"
+#include "./raylib-cpp-utils.hpp"
+#include "./raylib.hpp"
 
 namespace raylib {
 class Mesh;
@@ -13,7 +13,7 @@ class Mesh;
  * Model type
  */
 class Model : public ::Model {
- public:
+public:
     Model() {
         // Nothing.
     }
@@ -21,27 +21,21 @@ class Model : public ::Model {
     /*
      * Copy a model from another model.
      */
-    Model(const ::Model& model) {
-        set(model);
-    }
+    Model(const ::Model& model) : ::Model(model) { }
 
     /*
      * Load a model from a file.
      *
      * @throws raylib::RaylibException Throws if failed to load the Modal.
      */
-    Model(const std::string& fileName) {
-        Load(fileName);
-    }
+    Model(const std::string& fileName) { Load(fileName); }
 
     /*
      * Load a model from a mesh.
      *
      * @throws raylib::RaylibException Throws if failed to load the Modal.
      */
-    Model(const ::Mesh& mesh) {
-        Load(mesh);
-    }
+    Model(const ::Mesh& mesh) { Load(mesh); }
 
     /**
      * The Model constructor with a Mesh() is removed.
@@ -52,13 +46,11 @@ class Model : public ::Model {
      */
     Model(const raylib::Mesh& mesh) = delete;
 
-    ~Model() {
-        Unload();
-    }
+    ~Model() { Unload(); }
 
     Model(const Model&) = delete;
 
-    Model(Model&& other) {
+    Model(Model&& other) noexcept {
         set(other);
 
         other.meshCount = 0;
@@ -136,18 +128,22 @@ class Model : public ::Model {
     }
 
     /**
+     * Update model animation pose
+     */
+    Model& UpdateAnimationBones(const ::ModelAnimation& anim, int frame) {
+        ::UpdateModelAnimationBones(*this, anim, frame);
+        return *this;
+    }
+
+    /**
      * Check model animation skeleton match
      */
-    bool IsModelAnimationValid(const ::ModelAnimation& anim) const {
-        return ::IsModelAnimationValid(*this, anim);
-    }
+    [[nodiscard]] bool IsModelAnimationValid(const ::ModelAnimation& anim) const { return ::IsModelAnimationValid(*this, anim); }
 
     /**
      * Draw a model (with texture if set)
      */
-    void Draw(::Vector3 position,
-            float scale = 1.0f,
-            ::Color tint = {255, 255, 255, 255}) const {
+    void Draw(::Vector3 position, float scale = 1.0f, ::Color tint = {255, 255, 255, 255}) const {
         ::DrawModel(*this, position, scale, tint);
     }
 
@@ -155,20 +151,18 @@ class Model : public ::Model {
      * Draw a model with extended parameters
      */
     void Draw(
-            ::Vector3 position,
-            ::Vector3 rotationAxis,
-            float rotationAngle = 0.0f,
-            ::Vector3 scale = {1.0f, 1.0f, 1.0f},
-            ::Color tint = {255, 255, 255, 255}) const {
+        ::Vector3 position,
+        ::Vector3 rotationAxis,
+        float rotationAngle = 0.0f,
+        ::Vector3 scale = {1.0f, 1.0f, 1.0f},
+        ::Color tint = {255, 255, 255, 255}) const {
         ::DrawModelEx(*this, position, rotationAxis, rotationAngle, scale, tint);
     }
 
     /**
      * Draw a model wires (with texture if set)
      */
-    void DrawWires(::Vector3 position,
-            float scale = 1.0f,
-            ::Color tint = {255, 255, 255, 255}) const {
+    void DrawWires(::Vector3 position, float scale = 1.0f, ::Color tint = {255, 255, 255, 255}) const {
         ::DrawModelWires(*this, position, scale, tint);
     }
 
@@ -176,34 +170,42 @@ class Model : public ::Model {
      * Draw a model wires (with texture if set) with extended parameters
      */
     void DrawWires(
-            ::Vector3 position,
-            ::Vector3 rotationAxis,
-            float rotationAngle = 0.0f,
-            ::Vector3 scale = {1.0f, 1.0f, 1.0f},
-            ::Color tint = {255, 255, 255, 255}) const {
+        ::Vector3 position,
+        ::Vector3 rotationAxis,
+        float rotationAngle = 0.0f,
+        ::Vector3 scale = {1.0f, 1.0f, 1.0f},
+        ::Color tint = {255, 255, 255, 255}) const {
         ::DrawModelWiresEx(*this, position, rotationAxis, rotationAngle, scale, tint);
     }
 
     /**
-     * Compute model bounding box limits (considers all meshes)
+     * Draw a model as points
      */
-    BoundingBox GetBoundingBox() const {
-        return ::GetModelBoundingBox(*this);
+    void DrawPoints(::Vector3 position, float scale = 1.0f, ::Color tint = {255, 255, 255, 255}) {
+        ::DrawModelPoints(*this, position, scale, tint);
+    }
+
+    /**
+     * Draw a model as points
+     */
+    void DrawPoints(::Vector3 position, ::Vector3 rotationAxis, float rotationAngle = 0.0f, ::Vector3 scale = {1.0f, 1.0f, 1.0f}, ::Color tint = {255, 255, 255, 255}) {
+        ::DrawModelPointsEx(*this, position, rotationAxis, rotationAngle, scale, tint);
     }
 
     /**
      * Compute model bounding box limits (considers all meshes)
      */
-    operator BoundingBox() const {
-        return ::GetModelBoundingBox(*this);
-    }
+    [[nodiscard]] BoundingBox GetBoundingBox() const { return ::GetModelBoundingBox(*this); }
+
+    /**
+     * Compute model bounding box limits (considers all meshes)
+     */
+    explicit operator BoundingBox() const { return ::GetModelBoundingBox(*this); }
 
     /**
      * Determines whether or not the Model has data in it.
      */
-    bool IsReady() const {
-        return ::IsModelReady(*this);
-    }
+    [[nodiscard]] bool IsValid() const { return ::IsModelValid(*this); }
 
     /**
      * Loads a Model from the given file.
@@ -212,7 +214,7 @@ class Model : public ::Model {
      */
     void Load(const std::string& fileName) {
         set(::LoadModel(fileName.c_str()));
-        if (!IsReady()) {
+        if (!IsValid()) {
             throw RaylibException("Failed to load Model from " + fileName);
         }
     }
@@ -224,12 +226,11 @@ class Model : public ::Model {
      */
     void Load(const ::Mesh& mesh) {
         set(::LoadModelFromMesh(mesh));
-        if (!IsReady()) {
+        if (!IsValid()) {
             throw RaylibException("Failed to load Model from Mesh");
         }
     }
-
- protected:
+protected:
     void set(const ::Model& model) {
         transform = model.transform;
 
@@ -245,8 +246,8 @@ class Model : public ::Model {
     }
 };
 
-}  // namespace raylib
+} // namespace raylib
 
 using RModel = raylib::Model;
 
-#endif  // RAYLIB_CPP_INCLUDE_MODEL_HPP_
+#endif // RAYLIB_CPP_INCLUDE_MODEL_HPP_

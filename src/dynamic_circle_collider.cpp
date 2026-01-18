@@ -1,4 +1,5 @@
 #include "src/dynamic_circle_collider.h"
+#include "src/static_line_collider.h"
 #include "src/gameobject.h"
 
 
@@ -55,8 +56,8 @@ bool DynamicCircleCollider::collide_with_circle(const DynamicCircleCollider&othe
     return CheckCollisionCircles(other.get_position(),other.get_radius(),get_position(),radius);
 }
 bool DynamicCircleCollider::collide_with_static_line(const StaticLineCollider&other){
-    return false;
-
+    Line line = other.get_col_line();
+    return CheckCollisionCircleLine(get_position(),radius,line.a,line.b);
 }
 
 std::unique_ptr<DynamicCollider> DynamicCircleCollider::clone() const{

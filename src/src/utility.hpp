@@ -10,6 +10,7 @@ const int spatial_collider_grid_size = 128;
 struct Line{
     Vector2 a = {0,0};
     Vector2 b = {0,0};
+    float length = 0.0f;
 };
 
 struct Cell{

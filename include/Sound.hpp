@@ -3,9 +3,9 @@
 
 #include <string>
 
-#include "./raylib.hpp"
-#include "./raylib-cpp-utils.hpp"
 #include "./RaylibException.hpp"
+#include "./raylib-cpp-utils.hpp"
+#include "./raylib.hpp"
 
 namespace raylib {
 /**
@@ -17,12 +17,12 @@ namespace raylib {
  * @endcode
  */
 class Sound : public ::Sound {
- public:
+public:
     Sound(const Sound&) = delete;
     Sound& operator=(const Sound&) = delete;
 
     Sound() {
-        stream = { nullptr, nullptr, 0, 0, 0 };
+        stream = {nullptr, nullptr, 0, 0, 0};
         frameCount = 0;
     }
 
@@ -30,10 +30,10 @@ class Sound : public ::Sound {
         // Nothing.
     }
 
-    Sound(Sound&& other) {
+    Sound(Sound&& other) noexcept {
         set(other);
 
-        other.stream = { nullptr, nullptr, 0, 0, 0 };
+        other.stream = {nullptr, nullptr, 0, 0, 0};
         other.frameCount = 0;
     }
 
@@ -42,22 +42,16 @@ class Sound : public ::Sound {
      *
      * @throws raylib::RaylibException Throws if the Sound failed to load.
      */
-    Sound(const std::string& fileName) {
-        Load(fileName);
-    }
+    Sound(const std::string& fileName) { Load(fileName); }
 
     /**
      * Loads a sound from the given Wave.
      *
      * @throws raylib::RaylibException Throws if the Sound failed to load.
      */
-    Sound(const ::Wave& wave) {
-        Load(wave);
-    }
+    Sound(const ::Wave& wave) { Load(wave); }
 
-    ~Sound() {
-        Unload();
-    }
+    ~Sound() { Unload(); }
 
     GETTER(unsigned int, FrameCount, frameCount)
     GETTER(::AudioStream, Stream, stream)
@@ -70,7 +64,7 @@ class Sound : public ::Sound {
         Unload();
         set(other);
         other.frameCount = 0;
-        other.stream = { nullptr, nullptr, 0, 0, 0 };
+        other.stream = {nullptr, nullptr, 0, 0, 0};
 
         return *this;
     }
@@ -78,7 +72,7 @@ class Sound : public ::Sound {
     /**
      * Update sound buffer with new data
      */
-    Sound& Update(const void *data, int samplesCount) {
+    Sound& Update(const void* data, int samplesCount) {
         ::UpdateSound(*this, data, samplesCount);
         return *this;
     }
@@ -86,7 +80,7 @@ class Sound : public ::Sound {
     /**
      * Update sound buffer with new data, assuming it's the same sample count.
      */
-    Sound& Update(const void *data) {
+    Sound& Update(const void* data) {
         ::UpdateSound(*this, data, static_cast<int>(frameCount));
         return *this;
     }
@@ -137,9 +131,7 @@ class Sound : public ::Sound {
     /**
      * Check if a sound is currently playing
      */
-    bool IsPlaying() const {
-        return ::IsSoundPlaying(*this);
-    }
+    [[nodiscard]] bool IsPlaying() const { return ::IsSoundPlaying(*this); }
 
     /**
      * Set volume for a sound (1.0 is max level)
@@ -172,7 +164,7 @@ class Sound : public ::Sound {
      */
     void Load(const std::string& fileName) {
         set(::LoadSound(fileName.c_str()));
-        if (!IsReady()) {
+        if (!IsValid()) {
             throw RaylibException("Failed to load Sound from file");
         }
     }
@@ -184,7 +176,7 @@ class Sound : public ::Sound {
      */
     void Load(const ::Wave& wave) {
         set(::LoadSoundFromWave(wave));
-        if (!IsReady()) {
+        if (!IsValid()) {
             throw RaylibException("Failed to load Wave");
         }
     }
@@ -194,18 +186,15 @@ class Sound : public ::Sound {
      *
      * @return True or false depending on whether the Sound buffer is loaded.
      */
-    bool IsReady() const {
-        return ::IsSoundReady(*this);
-    }
-
- protected:
+    [[nodiscard]] bool IsValid() const { return ::IsSoundValid(*this); }
+protected:
     void set(const ::Sound& sound) {
         frameCount = sound.frameCount;
         stream = sound.stream;
     }
 };
-}  // namespace raylib
+} // namespace raylib
 
 using RSound = raylib::Sound;
 
-#endif  // RAYLIB_CPP_INCLUDE_SOUND_HPP_
+#endif // RAYLIB_CPP_INCLUDE_SOUND_HPP_
