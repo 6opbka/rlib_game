@@ -31,7 +31,7 @@ void Weapon::update(const float delta_time){
 void Weapon::follow_mouse(){
     auto r = get_root();
     Vector2 mouse_pos = r->mouse_world_pos;
-    direction = vector2_normalize(mouse_pos - get_world_position());
+    direction = Vector2Normalize(mouse_pos - get_world_position());
     float angle_rad = std::atan2(direction.y, direction.x);
     float angle_deg = angle_rad * 180.0f / PI;
     if (angle_deg < 0) angle_deg += 360.0f;

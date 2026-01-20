@@ -26,21 +26,21 @@ void Player::input(const float delta_time) {
 
     // Movement input
     if (direction.x != 0.0f || direction.y != 0.0f) {
-        direction = vector2_normalize(direction);
+        direction = Vector2Normalize(direction);
 
         velocity += direction * acceleration * delta_time;
 
-        float vel_len = vector2_length(velocity);
+        float vel_len = Vector2Length(velocity);
         if (vel_len > speed) {
-            velocity = vector2_normalize(velocity) * speed;
+            velocity = Vector2Normalize(velocity) * speed;
         }
     } else {
-        float vel_len = vector2_length(velocity);
+        float vel_len = Vector2Length(velocity);
         if (vel_len > 0.0f) {
-            Vector2 frictionForce = vector2_normalize(velocity) * friction * delta_time;
+            Vector2 frictionForce = Vector2Normalize(velocity) * friction * delta_time;
             
 
-            if (vector2_length(frictionForce) > vel_len) {
+            if (Vector2Length(frictionForce) > vel_len) {
                 velocity = {0.0f, 0.0f};
             } else {
                 velocity -= frictionForce;
@@ -48,7 +48,7 @@ void Player::input(const float delta_time) {
         }
     }
 
-    state = (vector2_length(direction)!=0) ? MOVING : STANDING;
+    state = (Vector2Length(direction)!=0) ? MOVING : STANDING;
 
     local_position += velocity * delta_time;
 }
