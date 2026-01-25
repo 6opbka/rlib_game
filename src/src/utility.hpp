@@ -5,7 +5,7 @@
 #include <iostream>
 #include <cstdint>
 
-const int spatial_collider_grid_size = 128;
+const int spatial_collider_grid_size = 16;
 
 struct Line{
     Vector2 a = {0,0};
@@ -16,7 +16,13 @@ struct Line{
 struct Cell{
     int x = 0;
     int y = 0;
- };
+};
+
+struct AABB{
+    Vector2 min{0.0f,0.0f};
+    Vector2 max{0.0f,0.0f};
+};
+
 
 struct CellCoordHash {
     std::size_t operator()(const Cell& coord) const {

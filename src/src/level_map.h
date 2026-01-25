@@ -16,8 +16,7 @@ private:
     bool inside(int x, int y);
     void normalize_edge(Line& edge);
     void merge_collinear(std::vector<Line>& edges, std::vector<Line>& merged, bool horizontal);
-    void grid_add_vert_wall(const Line& edge);
-    void grid_add_hor_wall(const Line& edge);
+    void grid_add_wall(StaticCollider* col);
 
 public:
     LevelMap();
@@ -29,6 +28,9 @@ public:
     
     void calculate_edges();
     void generate_collider_list();
+
+    AABB aabb_from_line(const Line& line);
+    int colliders_in_cells = 0;
 
     
 

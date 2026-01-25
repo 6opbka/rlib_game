@@ -35,7 +35,12 @@ public:
     
     void add_dynamic_object(shared_ptr<GameObject> object);
     
-    void check_collisions_in_grid();
+    // Checking collisions dynamic vs dynamic
+    void check_collisions_dyn();
+    // Checking collisions dynamic vs static
+    void check_collisions_st();
+
+    
 
     void add_cam(shared_ptr<Cam> cam);
     
@@ -52,4 +57,6 @@ public:
     shared_ptr<GameObject> instantiate(shared_ptr<GameObject> object);
     shared_ptr<GameObject> clone() const override;
     void remove_marked_objects();
+
+    
 };

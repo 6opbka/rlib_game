@@ -1,7 +1,7 @@
 #include "src/static_line_collider.h"
 
-StaticLineCollider::StaticLineCollider(CollisionLayer layer, CollisionLayer mask, ColliderShape shape, Line line_coords_):
-StaticCollider(layer,mask,shape),
+StaticLineCollider::StaticLineCollider(CollisionLayer layer, CollisionLayer mask, ColliderShape shape, Line line_coords_, AABB aabb_):
+StaticCollider(layer,mask,shape,aabb_),
 line_coords(line_coords_)
 {
     

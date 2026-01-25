@@ -249,12 +249,16 @@ void LevelMap::calculate_edges(){
 
 void LevelMap::generate_collider_list(){
     for(Line& edge:all_edges_ver){
-        std::unique_ptr<StaticLineCollider> col = make_unique<StaticLineCollider>(LAYER_WALL,LAYER_NONE,LINE,edge);
+        AABB aabb = aabb_from_line(edge);
+
+        std::unique_ptr<StaticLineCollider> col = make_unique<StaticLineCollider>(LAYER_WALL,LAYER_NONE,LINE,edge,aabb);
         static_colliders.push_back(std::move(col));
     }
 
     for(Line& edge:all_edges_hor){
-        std::unique_ptr<StaticLineCollider> col = make_unique<StaticLineCollider>(LAYER_WALL,LAYER_NONE,LINE,edge);
+        AABB aabb = aabb_from_line(edge);
+
+        std::unique_ptr<StaticLineCollider> col = make_unique<StaticLineCollider>(LAYER_WALL,LAYER_NONE,LINE,edge,aabb);
         static_colliders.push_back(std::move(col));
     }
 
@@ -353,57 +357,72 @@ void LevelMap::merge_collinear(vector<Line>& edges, vector<Line>& merged, bool h
 }
 
 void LevelMap::grid_add_colliders(){
-    for(const Line& edge: all_edges_hor){
-        grid_add_hor_wall(edge);
-    }
-    for(const Line& edge: all_edges_ver){
-        grid_add_vert_wall(edge);
-    }
-    cout<<"Cell num: "<<static_grid.size()<<endl;
     
-}
+    int grid_w = pixel_width  / spatial_collider_grid_size;
+    int grid_h = pixel_height / spatial_collider_grid_size;
 
-void LevelMap::grid_add_vert_wall(const Line& edge){
-    int x = edge.a.x;
-    int y0 = edge.a.y;
-    int y1 = edge.b.y;
+    static_grid.clear();
+    static_grid.resize(grid_w*grid_h);
 
-    if(y1<y0) std::swap(y0,y1);
+    for (auto& col: static_colliders){
+        grid_add_wall(col.get());
+    }
 
-    int cell_x = floor(x/ spatial_collider_grid_size);
-    int y_start = floor(y0/ spatial_collider_grid_size);
-    int y_end   = floor(y1 / spatial_collider_grid_size);
+    int non_empty = 0;
+int total = 0;
 
-
-
-    for (int y = y_start; y <= y_end; ++y) {
-        // static_grid[{cell_x, y}].push_back(edge);
+for (auto& cell : static_grid) {
+    if (!cell.empty()) {
+        non_empty++;
+        total += cell.size();
     }
 }
 
-
-void LevelMap::grid_add_hor_wall(const Line& edge){
+cout << "avg per non-empty cell: "
+     << (float)total / non_empty << endl;
+    // cout<<"colliders in cells: "<<colliders_in_cells<<endl;
     
-    int y = edge.a.y;
-    int x0 = edge.a.x;
-    int x1 = edge.b.x;
-    
-    if(x1<x0) std::swap(x0,x1);
+}
 
-    int cell_y = floor(y/ spatial_collider_grid_size);
-    int x_start = floor(x0/ spatial_collider_grid_size);
-    int x_end   = floor(x1 / spatial_collider_grid_size);
+void LevelMap::grid_add_wall(StaticCollider* col)
+{
+    AABB box = col->get_aabb();
 
-    for (int y = x_start; y <= x_end; ++y) {
-        // static_grid[{cell_y, y}].push_back(edge);
+    int grid_w = pixel_width  / spatial_collider_grid_size;
+    int grid_h = pixel_height / spatial_collider_grid_size;
+
+    int x0 = static_cast<int>(box.min.x) / spatial_collider_grid_size;
+    int y0 = static_cast<int>(box.min.y) / spatial_collider_grid_size;
+    int x1 = static_cast<int>(box.max.x) / spatial_collider_grid_size;
+    int y1 = static_cast<int>(box.max.y) / spatial_collider_grid_size;
+
+    x0 = clamp(x0, 0, grid_w - 1);
+    x1 = clamp(x1, 0, grid_w - 1);
+    y0 = clamp(y0, 0, grid_h - 1);
+    y1 = clamp(y1, 0, grid_h - 1);
+
+    for (int y = y0; y <= y1; ++y){
+        for (int x = x0; x <= x1; ++x){
+            static_grid[y * grid_w + x].push_back(col);
+            colliders_in_cells ++;
+        }
     }
 
+}
+
+AABB LevelMap::aabb_from_line(const Line& line){
+    AABB box;
+    box.min.x = min(line.a.x,line.b.x);
+    box.min.y = min(line.a.y,line.b.y);
+    box.max.x = max(line.a.x,line.b.x);
+    box.max.y = max(line.a.y,line.b.y);
+    return box;
 }
 
 
 LevelMap::LevelMap(){
-    pixel_width = map_width*spatial_collider_grid_size;
-    pixel_height = map_height*spatial_collider_grid_size;
+    pixel_width  = map_width  * tile_size;
+    pixel_height = map_height * tile_size;
 
 }
 LevelMap::~LevelMap(){

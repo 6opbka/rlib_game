@@ -63,7 +63,8 @@ void GameRoot::update(const float delta_time) {
         add_dynamic_object(child);
     }
     camera->update(delta_time);
-    check_collisions_in_grid();
+    check_collisions_dyn();
+    check_collisions_st();
     remove_marked_objects();
 
     // cout<<"num of objects: "<<num_of_objects<<endl;
@@ -150,7 +151,7 @@ void GameRoot::add_dynamic_object(std::shared_ptr<GameObject> object) {
 
 
 
-void GameRoot::check_collisions_in_grid() {
+void GameRoot::check_collisions_dyn() {
     int collision_checks = 0;
     debug_cells.clear();
     // Только "вперёд"
@@ -216,6 +217,22 @@ void GameRoot::check_collisions_in_grid() {
     // std::cout << "collision checks: " << collision_checks << std::endl;
 }
 
+void GameRoot::check_collisions_st(){
+    int collision_checks = 0;
+    // Checking only "forward"
+    static const int offsets[][2] = {
+        {0, 0},
+        {1, 0},
+        {0, 1},
+        {1, 1},
+        {-1, 1}
+    };
+    // cout<<"static_grid_size: "<<map.static_grid.size();
+    // cout<<"\nstatic_col_size: "<<map.static_colliders.size()<<endl;
+
+    
+}
+
 
 
 
@@ -243,6 +260,8 @@ void GameRoot::add_cam(shared_ptr<Cam> cam){
 }
 
 void GameRoot::init_map(){
+    cout<<"Generating map>>>\n";
+
     map.gen_map();
     
     Texture2D map_tex = map.create_texture();
@@ -258,4 +277,6 @@ void GameRoot::init_map(){
     map_->sprite_manager = sprite_manager;
     map_->add_sprite(map_sprite);
     add_child(map_);
+    cout<<"Generating map done!"<<endl;
+
 }
