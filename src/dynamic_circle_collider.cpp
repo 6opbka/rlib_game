@@ -45,6 +45,16 @@ bool DynamicCircleCollider::dynamic_collide(const DynamicCollider& other){
     return other.collide_with_circle(*this); 
 }
 bool DynamicCircleCollider::static_collide(const StaticCollider&other){
+    if(!can_collide_with(other)) return false;
+
+    switch (other.col_shape)
+    {
+    case LINE:
+         return collide_with_static_line(static_cast<const StaticLineCollider&>(other));
+        break;
+    default:
+        break;
+    }
     return false;
 }
 
